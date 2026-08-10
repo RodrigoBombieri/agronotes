@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Cuaderno de Campo Digital — Wireframes Etapa 1</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background: #f4f4f2;
+    color: #222;
+    margin: 0;
+    padding: 40px 24px 80px;
+  }
+  h1 { font-size: 24px; font-weight: 600; margin: 0 0 4px; }
+  .subtitle { color: #666; margin: 0 0 40px; font-size: 14px; }
+  h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 56px 0 6px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 8px;
+  }
+  .section-desc { color: #666; font-size: 13px; margin: 0 0 20px; }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: flex-start;
+  }
+  .screen-block { text-align: center; }
+  .screen-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  /* Phone frame */
+  .phone {
+    width: 220px;
+    height: 460px;
+    background: #fff;
+    border: 3px solid #333;
+    border-radius: 22px;
+    padding: 10px 8px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    font-size: 10px;
+  }
+  .phone .notch {
+    width: 50px; height: 5px; background: #333; border-radius: 3px;
+    margin: 0 auto 8px;
+  }
+  .wf-box {
+    background: #e9e9e6;
+    border: 1px dashed #999;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    text-align: center;
+    padding: 4px;
+  }
+  .wf-fill { background: #dcdcd8; }
+  .wf-accent { background: #cfd8cc; border-color: #7a9470; color: #4a5c46; font-weight: 600; }
+  .wf-header { height: 26px; margin-bottom: 6px; font-weight: 600; }
+  .wf-sync { height: 16px; margin-bottom: 6px; font-size: 9px; }
+  .wf-card { height: 44px; margin-bottom: 6px; flex-direction: column; align-items: flex-start; justify-content: center; padding: 6px 8px; }
+  .wf-card .l1 { font-weight: 600; color: #444; }
+  .wf-card .l2 { color: #888; font-size: 9px; }
+  .wf-fab {
+    position: absolute;
+    bottom: 14px; right: 14px;
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: #4a5c46;
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 300;
+  }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; flex: 1; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
+  .stepper { display: flex; gap: 4px; margin-bottom: 8px; }
+  .step-dot { flex: 1; height: 4px; border-radius: 2px; background: #ddd; }
+  .step-dot.active { background: #4a5c46; }
+  .filter-row { display: flex; gap: 4px; margin-bottom: 6px; }
+  .filter-chip { flex: 1; height: 20px; font-size: 8px; }
+  .btn-primary {
+    height: 30px; background: #333; color: #fff; border-radius: 4px;
+    font-weight: 600; margin-top: auto;
+  }
+
+  /* Web frame */
+  .web {
+    width: 620px;
+    background: #fff;
+    border: 2px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 11px;
+  }
+  .web-topbar {
+    height: 30px;
+    background: #2c2c2a;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0 10px;
+  }
+  .web-dot { width: 8px; height: 8px; border-radius: 50%; background: #555; }
+  .web-body { display: flex; min-height: 340px; }
+  .web-sidebar {
+    width: 130px;
+    background: #f1f1ee;
+    border-right: 1px solid #ddd;
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .nav-item { padding: 8px; border-radius: 4px; color: #666; }
+  .nav-item.active { background: #cfd8cc; color: #4a5c46; font-weight: 600; }
+  .web-main { flex: 1; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .metric-row { display: flex; gap: 8px; }
+  .metric-card { flex: 1; height: 54px; flex-direction: column; }
+  .metric-card .num { font-size: 16px; font-weight: 700; color: #444; }
+  .metric-card .lbl { font-size: 9px; color: #888; }
+  .table-mock { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+  .table-header { height: 22px; background: #ddd; font-weight: 600; }
+  .table-row { height: 20px; }
+  .tabs-row { display: flex; gap: 4px; margin-bottom: 4px; }
+  .tab { padding: 6px 12px; font-size: 10px; }
+  .tab.active { background: #cfd8cc; color: #4a5c46; font-weight: 600; border-radius: 4px 4px 0 0; }
+
+  svg text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; }
+</style>
+</head>
+<body>
+
+<h1>Cuaderno de Campo Digital — Wireframes Etapa 1</h1>
+<p class="subtitle">Baja fidelidad — layout y flujo, no diseño final. Ver planificador.md, Etapa 1.</p>
+
+<h2>Mobile</h2>
+<p class="section-desc">5 pantallas: Login/selección de campo, Home, Nueva tarea (3 pasos), Historial, Estado de sincronización.</p>
+<div class="row">
+
+  <div class="screen-block">
+    <div class="screen-label">1. Login / Selección de campo</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="wf-box wf-accent" style="height:60px; margin-bottom:20px;">LOGO</div>
+      <div class="wf-box wf-fill" style="height:30px; margin-bottom:8px;">Email</div>
+      <div class="wf-box wf-fill" style="height:30px; margin-bottom:16px;">Contraseña</div>
+      <div class="wf-box btn-primary" style="margin-top:0;">Ingresar</div>
+      <div style="flex:1;"></div>
+      <div class="wf-box wf-fill" style="height:26px;">Seleccionar campo ▾</div>
+    </div>
+  </div>
+
+  <div class="screen-block">
+    <div class="screen-label">2. Home</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="wf-box wf-sync">● 2 pendientes de sync</div>
+      <div class="wf-box wf-header">Campo Norte — hoy</div>
+      <div class="wf-box wf-card"><div class="l1">Lote 4 — Herbicida</div><div class="l2">200 L · hace 1h</div></div>
+      <div class="wf-box wf-card"><div class="l1">Lote 2 — Combustible</div><div class="l2">80 L · hace 3h</div></div>
+      <div class="wf-box wf-card"><div class="l1">Lote 7 — Siembra</div><div class="l2">12 ha · ayer</div></div>
+      <div style="flex:1;"></div>
+      <div class="wf-fab">+</div>
+    </div>
+  </div>
+
+  <div class="screen-block">
+    <div class="screen-label">3. Nueva tarea (3 pasos)</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="stepper">
+        <div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div>
+      </div>
+      <div class="wf-box wf-header">Paso 1 — Elegí el lote</div>
+      <div class="grid3" style="flex:1;">
+        <div class="wf-box wf-accent">Lote 1</div>
+        <div class="wf-box">Lote 2</div>
+        <div class="wf-box">Lote 3</div>
+        <div class="wf-box">Lote 4</div>
+        <div class="wf-box">Lote 5</div>
+        <div class="wf-box">Lote 6</div>
+      </div>
+      <div class="wf-box btn-primary">Siguiente</div>
+    </div>
+  </div>
+
+  <div class="screen-block">
+    <div class="screen-label">3b. Detalle (paso 3)</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="stepper">
+        <div class="step-dot active"></div><div class="step-dot active"></div><div class="step-dot active"></div>
+      </div>
+      <div class="wf-box wf-header">Lote 4 — Herbicida</div>
+      <div class="wf-box wf-fill" style="height:30px; margin-bottom:8px;">Cantidad</div>
+      <div class="wf-box wf-fill" style="height:26px; margin-bottom:8px;">Unidad: Litros ▾</div>
+      <div class="wf-box wf-fill" style="height:50px; margin-bottom:8px;">Observación (opcional)</div>
+      <div style="flex:1;"></div>
+      <div class="wf-box btn-primary">Guardar tarea</div>
+    </div>
+  </div>
+
+  <div class="screen-block">
+    <div class="screen-label">4. Historial</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="wf-box wf-header">Historial</div>
+      <div class="filter-row">
+        <div class="wf-box filter-chip">Lote ▾</div>
+        <div class="wf-box filter-chip">Tipo ▾</div>
+        <div class="wf-box filter-chip">Fecha ▾</div>
+      </div>
+      <div class="wf-box wf-card"><div class="l1">Lote 4 — Herbicida</div><div class="l2">200 L · 05/08</div></div>
+      <div class="wf-box wf-card"><div class="l1">Lote 2 — Combustible</div><div class="l2">80 L · 04/08</div></div>
+      <div class="wf-box wf-card"><div class="l1">Lote 7 — Siembra</div><div class="l2">12 ha · 03/08</div></div>
+      <div class="wf-box wf-card"><div class="l1">Lote 1 — Cosecha</div><div class="l2">40 ha · 01/08</div></div>
+    </div>
+  </div>
+
+  <div class="screen-block">
+    <div class="screen-label">5. Estado de sincronización</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="wf-box wf-header">Sincronización</div>
+      <div class="wf-box wf-fill" style="height:36px; margin-bottom:6px;">✓ 14 tareas sincronizadas</div>
+      <div class="wf-box" style="height:36px; margin-bottom:6px; border-color:#c99; color:#a33;">⚠ 2 pendientes (sin señal)</div>
+      <div class="wf-box" style="height:36px; margin-bottom:6px; border-color:#c99; color:#a33;">✕ 1 error — revisar</div>
+      <div style="flex:1;"></div>
+      <div class="wf-box btn-primary">Reintentar ahora</div>
+    </div>
+  </div>
+
+</div>
+
+<h2>Panel web</h2>
+<p class="section-desc">3 pantallas: Dashboard, tabla filtrable, gestión de usuarios/lotes/suscripción.</p>
+<div class="row" style="flex-direction:column; gap:32px;">
+
+  <div class="screen-block" style="text-align:left;">
+    <div class="screen-label">1. Dashboard</div>
+    <div class="web">
+      <div class="web-topbar"><div class="web-dot"></div><div class="web-dot"></div><div class="web-dot"></div></div>
+      <div class="web-body">
+        <div class="web-sidebar">
+          <div class="nav-item active">Dashboard</div>
+          <div class="nav-item">Tareas</div>
+          <div class="nav-item">Usuarios</div>
+          <div class="nav-item">Lotes</div>
+          <div class="nav-item">Suscripción</div>
+        </div>
+        <div class="web-main">
+          <div class="metric-row">
+            <div class="wf-box metric-card"><div class="num">128</div><div class="lbl">tareas este mes</div></div>
+            <div class="wf-box metric-card"><div class="num">3.400 L</div><div class="lbl">insumos aplicados</div></div>
+            <div class="wf-box metric-card"><div class="num">210 ha</div><div class="lbl">sembradas</div></div>
+          </div>
+          <div class="wf-box wf-fill" style="height:110px;">Gráfico — tareas por semana</div>
+          <div class="table-mock">
+            <div class="wf-box table-header">Actividad reciente</div>
+            <div class="wf-box table-row"></div>
+            <div class="wf-box table-row"></div>
+            <div class="wf-box table-row"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen-block" style="text-align:left;">
+    <div class="screen-label">2. Tabla filtrable</div>
+    <div class="web">
+      <div class="web-topbar"><div class="web-dot"></div><div class="web-dot"></div><div class="web-dot"></div></div>
+      <div class="web-body">
+        <div class="web-sidebar">
+          <div class="nav-item">Dashboard</div>
+          <div class="nav-item active">Tareas</div>
+          <div class="nav-item">Usuarios</div>
+          <div class="nav-item">Lotes</div>
+          <div class="nav-item">Suscripción</div>
+        </div>
+        <div class="web-main">
+          <div class="filter-row" style="margin-bottom:0;">
+            <div class="wf-box filter-chip" style="height:24px;">Campo ▾</div>
+            <div class="wf-box filter-chip" style="height:24px;">Lote ▾</div>
+            <div class="wf-box filter-chip" style="height:24px;">Tipo ▾</div>
+            <div class="wf-box filter-chip" style="height:24px;">Fecha ▾</div>
+            <div class="wf-box filter-chip wf-accent" style="height:24px;">Exportar ⇩</div>
+          </div>
+          <div class="table-mock">
+            <div class="wf-box table-header">Fecha · Lote · Tipo · Cantidad · Usuario</div>
+            <div class="wf-box table-row"></div>
+            <div class="wf-box table-row"></div>
+            <div class="wf-box table-row"></div>
+            <div class="wf-box table-row"></div>
+            <div class="wf-box table-row"></div>
+            <div class="wf-box table-row"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen-block" style="text-align:left;">
+    <div class="screen-label">3. Gestión (usuarios / lotes / suscripción)</div>
+    <div class="web">
+      <div class="web-topbar"><div class="web-dot"></div><div class="web-dot"></div><div class="web-dot"></div></div>
+      <div class="web-body">
+        <div class="web-sidebar">
+          <div class="nav-item">Dashboard</div>
+          <div class="nav-item">Tareas</div>
+          <div class="nav-item active">Usuarios</div>
+          <div class="nav-item">Lotes</div>
+          <div class="nav-item">Suscripción</div>
+        </div>
+        <div class="web-main">
+          <div class="tabs-row">
+            <div class="wf-box tab active">Usuarios</div>
+            <div class="wf-box tab">Lotes</div>
+            <div class="wf-box tab">Suscripción</div>
+          </div>
+          <div class="table-mock">
+            <div class="wf-box table-header">Nombre · Email · Rol · Acciones</div>
+            <div class="wf-box table-row"></div>
+            <div class="wf-box table-row"></div>
+            <div class="wf-box table-row"></div>
+          </div>
+          <div class="wf-box wf-accent" style="height:26px; width:140px;">+ Invitar usuario</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<h2>Flujo offline → sync</h2>
+<p class="section-desc">Ciclo de vida de una tarea desde que se crea en el dispositivo hasta que queda reflejada en el panel.</p>
+
+<svg viewBox="0 0 980 420" width="980" height="420" role="img" aria-label="Diagrama de flujo offline a sincronización">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#555"/>
+    </marker>
+  </defs>
+
+  <!-- Row 1 -->
+  <rect x="20" y="30" width="170" height="60" rx="6" fill="#e9e9e6" stroke="#999"/>
+  <text x="105" y="55" text-anchor="middle" font-size="12" font-weight="600" fill="#333">Usuario registra tarea</text>
+  <text x="105" y="72" text-anchor="middle" font-size="10" fill="#777">3 pasos, con o sin señal</text>
+
+  <line x1="190" y1="60" x2="240" y2="60" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="240" y="30" width="190" height="60" rx="6" fill="#cfd8cc" stroke="#7a9470"/>
+  <text x="335" y="55" text-anchor="middle" font-size="12" font-weight="600" fill="#3f4f3c">Guardado local (SQLite)</text>
+  <text x="335" y="72" text-anchor="middle" font-size="10" fill="#5c6c58">local_id (UUID) + sync_status=pending</text>
+
+  <line x1="430" y1="60" x2="480" y2="60" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="480" y="30" width="190" height="60" rx="6" fill="#e9e9e6" stroke="#999"/>
+  <text x="575" y="55" text-anchor="middle" font-size="12" font-weight="600" fill="#333">Cola de sincronización</text>
+  <text x="575" y="72" text-anchor="middle" font-size="10" fill="#777">acumula pendientes en orden</text>
+
+  <line x1="575" y1="90" x2="575" y2="140" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Decision -->
+  <polygon points="575,140 660,180 575,220 490,180" fill="#f5eecf" stroke="#b89a3d"/>
+  <text x="575" y="176" text-anchor="middle" font-size="11" font-weight="600" fill="#6b5a1f">¿Hay conexión?</text>
+  <text x="575" y="192" text-anchor="middle" font-size="9" fill="#8a7530">chequeo periódico</text>
+
+  <!-- No branch -->
+  <line x1="490" y1="180" x2="240" y2="180" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="365" y="172" text-anchor="middle" font-size="10" fill="#a33">No</text>
+  <rect x="60" y="150" width="180" height="60" rx="6" fill="#f7e3e3" stroke="#c99"/>
+  <text x="150" y="175" text-anchor="middle" font-size="12" font-weight="600" fill="#8a3a3a">Espera / reintento</text>
+  <text x="150" y="192" text-anchor="middle" font-size="10" fill="#a35c5c">tarea sigue disponible offline</text>
+  <line x1="150" y1="210" x2="150" y2="290" stroke="#555" stroke-width="1.5"/>
+  <line x1="150" y1="290" x2="480" y2="290" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="315" y="282" text-anchor="middle" font-size="9" fill="#777">vuelve a chequear conexión</text>
+
+  <!-- Yes branch -->
+  <line x1="660" y1="180" x2="760" y2="180" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="705" y="172" text-anchor="middle" font-size="10" fill="#3f4f3c">Sí</text>
+  <rect x="760" y="150" width="190" height="60" rx="6" fill="#cfd8cc" stroke="#7a9470"/>
+  <text x="855" y="175" text-anchor="middle" font-size="12" font-weight="600" fill="#3f4f3c">Sube a Supabase</text>
+  <text x="855" y="192" text-anchor="middle" font-size="10" fill="#5c6c58">upsert por local_id</text>
+
+  <line x1="855" y1="210" x2="855" y2="260" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Decision 2 -->
+  <polygon points="855,260 940,300 855,340 770,300" fill="#f5eecf" stroke="#b89a3d"/>
+  <text x="855" y="296" text-anchor="middle" font-size="11" font-weight="600" fill="#6b5a1f">¿Éxito?</text>
+
+  <!-- Success -->
+  <line x1="770" y1="300" x2="480" y2="380" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="640" y="325" text-anchor="middle" font-size="10" fill="#3f4f3c">Sí</text>
+  <rect x="300" y="350" width="200" height="60" rx="6" fill="#cfd8cc" stroke="#7a9470"/>
+  <text x="400" y="375" text-anchor="middle" font-size="12" font-weight="600" fill="#3f4f3c">synced_at + sync_status=synced</text>
+  <text x="400" y="392" text-anchor="middle" font-size="10" fill="#5c6c58">visible en el panel web</text>
+
+  <!-- Error -->
+  <line x1="940" y1="300" x2="970" y2="300" stroke="#555" stroke-width="1.5"/>
+  <line x1="970" y1="300" x2="970" y2="380" stroke="#555" stroke-width="1.5"/>
+  <line x1="970" y1="380" x2="530" y2="380" stroke="#555" stroke-width="0" opacity="0"/>
+  <line x1="855" y1="340" x2="855" y2="380" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="880" y="330" text-anchor="middle" font-size="10" fill="#a33">No</text>
+  <rect x="740" y="350" width="200" height="60" rx="6" fill="#f7e3e3" stroke="#c99"/>
+  <text x="840" y="375" text-anchor="middle" font-size="12" font-weight="600" fill="#8a3a3a">sync_status=error</text>
+  <text x="840" y="392" text-anchor="middle" font-size="10" fill="#a35c5c">reintento automático + aviso en app</text>
+</svg>
+
+</body>
+</html>
