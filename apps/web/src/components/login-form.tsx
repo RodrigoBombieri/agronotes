@@ -36,7 +36,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="email" className="text-sm font-medium">
+        <label htmlFor="email" className="text-sm font-bold text-ink">
           Email
         </label>
         <input
@@ -47,11 +47,11 @@ export function LoginForm() {
           required
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="rounded-md border border-neutral-300 px-3 py-2 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 dark:border-neutral-700 dark:bg-neutral-900"
+          className="rounded-xl border-2 border-line bg-cream px-3 py-2.5 text-[15px] font-semibold text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
         />
       </div>
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="password" className="text-sm font-medium">
+        <label htmlFor="password" className="text-sm font-bold text-ink">
           Contraseña
         </label>
         <input
@@ -62,12 +62,12 @@ export function LoginForm() {
           required
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          className="rounded-md border border-neutral-300 px-3 py-2 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 dark:border-neutral-700 dark:bg-neutral-900"
+          className="rounded-xl border-2 border-line bg-cream px-3 py-2.5 text-[15px] font-semibold text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
         />
       </div>
 
       {error && (
-        <p role="alert" className="text-sm text-red-600 dark:text-red-400">
+        <p role="alert" className="text-sm font-bold text-danger">
           {error}
         </p>
       )}
@@ -75,7 +75,7 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white hover:bg-neutral-700 disabled:opacity-60 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+        className="mt-1 rounded-xl bg-brand-900 px-3 py-2.5 text-[15px] font-extrabold text-white hover:bg-brand-700 disabled:opacity-60"
       >
         {loading ? "Ingresando…" : "Ingresar"}
       </button>

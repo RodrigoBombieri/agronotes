@@ -4,6 +4,7 @@
 
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { SyncState } from "@/lib/sync/useSync";
+import { colors, fonts, radii, shadow, spacing } from "@/lib/theme";
 
 export function SyncStatusBadge({ sync }: { sync: SyncState }) {
   const { isOnline, isSyncing, pendingCount, lastError, syncNow } = sync;
@@ -13,19 +14,19 @@ export function SyncStatusBadge({ sync }: { sync: SyncState }) {
 
   if (!isOnline) {
     label = pendingCount > 0 ? `Sin conexión · ${pendingCount} pendiente(s)` : "Sin conexión";
-    color = "#78716c";
+    color = colors.inkFaint;
   } else if (isSyncing) {
     label = "Sincronizando…";
-    color = "#2563eb";
+    color = colors.brand500;
   } else if (lastError) {
     label = lastError;
-    color = "#dc2626";
+    color = colors.danger;
   } else if (pendingCount > 0) {
     label = `${pendingCount} pendiente(s) de sincronizar`;
-    color = "#d97706";
+    color = colors.warning;
   } else {
     label = "Todo sincronizado";
-    color = "#16a34a";
+    color = colors.success;
   }
 
   return (
@@ -33,7 +34,7 @@ export function SyncStatusBadge({ sync }: { sync: SyncState }) {
       onPress={() => syncNow()}
       accessibilityRole="button"
       accessibilityLabel={`Estado de sincronización: ${label}. Tocar para sincronizar ahora.`}
-      style={styles.container}
+      style={({ pressed }) => [styles.container, pressed && styles.pressed]}
     >
       <View style={[styles.dot, { backgroundColor: color }]} />
       <Text style={styles.label}>{label}</Text>
@@ -45,17 +46,25 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: spacing.sm,
+    alignSelf: "flex-start",
     paddingVertical: 8,
-    paddingHorizontal: 4,
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.md,
+    marginBottom: spacing.xs,
+    backgroundColor: colors.white,
+    borderRadius: radii.pill,
+    ...shadow,
   },
+  pressed: { opacity: 0.7 },
   dot: {
     width: 8,
     height: 8,
     borderRadius: 4,
   },
   label: {
-    fontSize: 13,
-    color: "#44403c",
+    fontSize: 12,
+    fontFamily: fonts.bold,
+    color: colors.ink,
   },
 });

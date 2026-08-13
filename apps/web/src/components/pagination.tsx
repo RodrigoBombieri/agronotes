@@ -25,33 +25,33 @@ export function Pagination({ page, pageSize, total, searchParams }: Props) {
   return (
     <nav
       aria-label="Paginación de tareas"
-      className="mt-4 flex items-center justify-between text-sm"
+      className="mt-4 flex items-center justify-between text-sm font-bold"
     >
-      <p className="text-neutral-500 dark:text-neutral-400">
+      <p className="text-ink-muted">
         {total === 0 ? "Sin resultados" : `Mostrando ${from}–${to} de ${total}`}
       </p>
       <div className="flex gap-2">
         {page > 0 ? (
           <Link
             href={hrefForPage(searchParams, page - 1)}
-            className="rounded-md border border-neutral-300 px-3 py-1.5 font-medium hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+            className="rounded-lg border-2 border-line px-3 py-1.5 text-ink hover:bg-brand-50"
           >
             Anterior
           </Link>
         ) : (
-          <span className="rounded-md border border-neutral-200 px-3 py-1.5 font-medium text-neutral-400 dark:border-neutral-800">
+          <span className="rounded-lg border-2 border-line px-3 py-1.5 text-ink-faint">
             Anterior
           </span>
         )}
         {page + 1 < totalPages ? (
           <Link
             href={hrefForPage(searchParams, page + 1)}
-            className="rounded-md border border-neutral-300 px-3 py-1.5 font-medium hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+            className="rounded-lg border-2 border-line px-3 py-1.5 text-ink hover:bg-brand-50"
           >
             Siguiente
           </Link>
         ) : (
-          <span className="rounded-md border border-neutral-200 px-3 py-1.5 font-medium text-neutral-400 dark:border-neutral-800">
+          <span className="rounded-lg border-2 border-line px-3 py-1.5 text-ink-faint">
             Siguiente
           </span>
         )}

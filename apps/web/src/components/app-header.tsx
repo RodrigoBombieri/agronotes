@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { SignOutButton } from "@/components/sign-out-button";
@@ -11,21 +12,22 @@ export async function AppHeader() {
   if (!user) return null;
 
   return (
-    <header className="border-b border-neutral-200 dark:border-neutral-800">
+    <header className="bg-brand-900">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-        <Link href="/" className="text-sm font-semibold tracking-tight">
-          Agronotes — Panel
+        <Link href="/" className="flex items-center gap-2.5 text-[15px] font-extrabold text-white">
+          <Image src="/logo-64.png" alt="" width={28} height={28} className="rounded-lg" priority />
+          Agronotes
         </Link>
-        <nav aria-label="Navegación principal" className="flex items-center gap-4 text-sm">
-          <Link href="/" className="hover:underline">
+        <nav aria-label="Navegación principal" className="flex items-center gap-5 text-sm font-bold">
+          <Link href="/" className="text-brand-100 hover:text-white">
             Dashboard
           </Link>
-          <Link href="/tareas" className="hover:underline">
+          <Link href="/tareas" className="text-brand-100 hover:text-white">
             Tareas
           </Link>
         </nav>
         <div className="flex items-center gap-3">
-          <span className="text-sm text-neutral-500 dark:text-neutral-400">{user.email}</span>
+          <span className="hidden text-xs font-semibold text-brand-200 sm:inline">{user.email}</span>
           <SignOutButton />
         </div>
       </div>

@@ -16,10 +16,10 @@ export default async function DashboardPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Dashboard</h1>
+        <h1 className="text-xl font-extrabold text-brand-900">Dashboard</h1>
         <Link
           href="/tareas"
-          className="text-sm font-medium text-neutral-700 underline underline-offset-2 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white"
+          className="text-sm font-bold text-brand-700 underline underline-offset-2 hover:text-brand-900"
         >
           Ver todas las tareas
         </Link>
@@ -30,67 +30,67 @@ export default async function DashboardPage() {
         <StatCard label="Tareas últimos 7 días" value={summary.tareasUltimos7Dias} />
       </section>
 
-      <section aria-labelledby="por-tipo-heading" className="mb-8">
-        <h2 id="por-tipo-heading" className="mb-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+      <section aria-labelledby="por-tipo-heading" className="mb-8 rounded-2xl border border-line bg-white p-5 shadow-sm">
+        <h2 id="por-tipo-heading" className="mb-4 text-sm font-extrabold text-brand-800">
           Por tipo de tarea (últimos 30 días)
         </h2>
         {summary.porTipo.length === 0 ? (
-          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          <p className="text-sm font-semibold text-ink-muted">
             Todavía no hay tareas registradas en este período.
           </p>
         ) : (
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col gap-2.5">
             {summary.porTipo.map((item) => (
-              <li key={item.nombre} className="flex items-center gap-3 text-sm">
-                <span className="w-40 shrink-0 truncate">{item.nombre}</span>
-                <div className="h-2 flex-1 rounded-full bg-neutral-100 dark:bg-neutral-800">
+              <li key={item.nombre} className="flex items-center gap-3 text-sm font-bold">
+                <span className="w-40 shrink-0 truncate text-ink">{item.nombre}</span>
+                <div className="h-2.5 flex-1 rounded-full bg-brand-50">
                   <div
-                    className="h-2 rounded-full bg-neutral-900 dark:bg-white"
+                    className="h-2.5 rounded-full bg-brand-300"
                     style={{
                       width: `${(item.cantidad / summary.porTipo[0].cantidad) * 100}%`,
                     }}
                   />
                 </div>
-                <span className="w-8 shrink-0 text-right tabular-nums">{item.cantidad}</span>
+                <span className="w-8 shrink-0 text-right tabular-nums text-ink-muted">{item.cantidad}</span>
               </li>
             ))}
           </ul>
         )}
       </section>
 
-      <section aria-labelledby="recientes-heading">
-        <h2 id="recientes-heading" className="mb-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+      <section aria-labelledby="recientes-heading" className="rounded-2xl border border-line bg-white p-5 shadow-sm">
+        <h2 id="recientes-heading" className="mb-4 text-sm font-extrabold text-brand-800">
           Últimos registros
         </h2>
         {summary.recientes.length === 0 ? (
-          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          <p className="text-sm font-semibold text-ink-muted">
             Todavía no se registró ninguna tarea.
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-neutral-200 dark:border-neutral-800">
+          <div className="overflow-x-auto rounded-xl border border-line">
             <table className="w-full text-sm">
               <caption className="sr-only">Últimas tareas registradas</caption>
-              <thead className="bg-neutral-50 text-left dark:bg-neutral-900">
+              <thead className="bg-brand-50 text-left">
                 <tr>
-                  <th scope="col" className="px-3 py-2 font-medium">Fecha</th>
-                  <th scope="col" className="px-3 py-2 font-medium">Tipo</th>
-                  <th scope="col" className="px-3 py-2 font-medium">Campo</th>
-                  <th scope="col" className="px-3 py-2 font-medium">Lote</th>
-                  <th scope="col" className="px-3 py-2 font-medium">Cantidad</th>
-                  <th scope="col" className="px-3 py-2 font-medium">Usuario</th>
+                  <th scope="col" className="px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-brand-800">Fecha</th>
+                  <th scope="col" className="px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-brand-800">Tipo</th>
+                  <th scope="col" className="px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-brand-800">Campo</th>
+                  <th scope="col" className="px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-brand-800">Lote</th>
+                  <th scope="col" className="px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-brand-800">Cantidad</th>
+                  <th scope="col" className="px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-brand-800">Usuario</th>
                 </tr>
               </thead>
               <tbody>
                 {summary.recientes.map((tarea) => (
-                  <tr key={tarea.id} className="border-t border-neutral-200 dark:border-neutral-800">
-                    <td className="px-3 py-2">{dateFormatter.format(new Date(tarea.occurredAt))}</td>
-                    <td className="px-3 py-2">{tarea.tipo}</td>
-                    <td className="px-3 py-2">{tarea.campo}</td>
-                    <td className="px-3 py-2">{tarea.lote}</td>
-                    <td className="px-3 py-2 tabular-nums">
+                  <tr key={tarea.id} className="border-t border-line font-semibold text-ink">
+                    <td className="px-3 py-2.5 whitespace-nowrap">{dateFormatter.format(new Date(tarea.occurredAt))}</td>
+                    <td className="px-3 py-2.5">{tarea.tipo}</td>
+                    <td className="px-3 py-2.5">{tarea.campo}</td>
+                    <td className="px-3 py-2.5">{tarea.lote}</td>
+                    <td className="px-3 py-2.5 tabular-nums">
                       {tarea.quantity} {tarea.unit}
                     </td>
-                    <td className="px-3 py-2">{tarea.usuario}</td>
+                    <td className="px-3 py-2.5">{tarea.usuario}</td>
                   </tr>
                 ))}
               </tbody>

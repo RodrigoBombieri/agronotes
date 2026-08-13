@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -10,7 +11,9 @@ import {
   View,
 } from "react-native";
 import { Redirect } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { colors, fonts, radii, shadow, spacing } from "@/lib/theme";
 
 export default function LoginScreen() {
   const { session, isLoading, signIn } = useAuth();
@@ -22,7 +25,7 @@ export default function LoginScreen() {
   if (isLoading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator />
+        <ActivityIndicator color={colors.brand700} />
       </View>
     );
   }
@@ -44,81 +47,107 @@ export default function LoginScreen() {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <Text style={styles.title}>Agronotes</Text>
-      <Text style={styles.subtitle}>Cuaderno de campo digital</Text>
-
-      <View style={styles.field}>
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          autoComplete="email"
-          keyboardType="email-address"
-          textContentType="emailAddress"
-          style={styles.input}
-          accessibilityLabel="Email"
+      <StatusBar style="dark" />
+      <View style={styles.card}>
+        <Image
+          source={require("../assets/icon.png")}
+          style={styles.logo}
+          accessibilityLabel="Logo de Agronotes"
         />
-      </View>
+        <Text style={styles.title}>Agronotes</Text>
+        <Text style={styles.subtitle}>Cuaderno de campo digital</Text>
 
-      <View style={styles.field}>
-        <Text style={styles.label}>Contraseña</Text>
-        <TextInput
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          autoComplete="password"
-          textContentType="password"
-          style={styles.input}
-          accessibilityLabel="Contraseña"
-        />
-      </View>
+        <View style={styles.field}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            autoComplete="email"
+            keyboardType="email-address"
+            textContentType="emailAddress"
+            style={styles.input}
+            accessibilityLabel="Email"
+          />
+        </View>
 
-      {error && (
-        <Text style={styles.error} accessibilityRole="alert">
-          {error}
-        </Text>
-      )}
+        <View style={styles.field}>
+          <Text style={styles.label}>Contraseña</Text>
+          <TextInput
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            autoComplete="password"
+            textContentType="password"
+            style={styles.input}
+            accessibilityLabel="Contraseña"
+          />
+        </View>
 
-      <Pressable
-        onPress={handleSubmit}
-        disabled={submitting || !email || !password}
-        style={[styles.button, (submitting || !email || !password) && styles.buttonDisabled]}
-        accessibilityRole="button"
-      >
-        {submitting ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.buttonText}>Ingresar</Text>
+        {error && (
+          <Text style={styles.error} accessibilityRole="alert">
+            {error}
+          </Text>
         )}
-      </Pressable>
+
+        <Pressable
+          onPress={handleSubmit}
+          disabled={submitting || !email || !password}
+          style={({ pressed }) => [
+            styles.button,
+            (submitting || !email || !password) && styles.buttonDisabled,
+            pressed && styles.buttonPressed,
+          ]}
+          accessibilityRole="button"
+        >
+          {submitting ? (
+            <ActivityIndicator color={colors.white} />
+          ) : (
+            <Text style={styles.buttonText}>Ingresar</Text>
+          )}
+        </Pressable>
+      </View>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 24, gap: 4 },
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  title: { fontSize: 28, fontWeight: "700", textAlign: "center" },
-  subtitle: { fontSize: 14, color: "#57534e", textAlign: "center", marginBottom: 32 },
-  field: { marginBottom: 16 },
-  label: { fontSize: 13, fontWeight: "600", marginBottom: 6, color: "#44403c" },
-  input: {
-    borderWidth: 1,
-    borderColor: "#d6d3d1",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
+  container: { flex: 1, justifyContent: "center", padding: spacing.xl, backgroundColor: colors.cream },
+  center: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: colors.cream },
+  card: {
+    backgroundColor: colors.white,
+    borderRadius: radii.lg,
+    padding: spacing.xl,
+    alignItems: "center",
+    ...shadow,
   },
-  error: { color: "#dc2626", marginBottom: 12, fontSize: 13 },
+  logo: { width: 64, height: 64, borderRadius: radii.md, marginBottom: spacing.md },
+  title: { fontFamily: fonts.extraBold, fontSize: 22, color: colors.brand900 },
+  subtitle: { fontFamily: fonts.semiBold, fontSize: 13, color: colors.inkMuted, marginBottom: spacing.xl },
+  field: { width: "100%", marginBottom: spacing.md },
+  label: { fontFamily: fonts.bold, fontSize: 12, marginBottom: 6, color: colors.ink },
+  input: {
+    width: "100%",
+    borderWidth: 2,
+    borderColor: colors.line,
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 11,
+    fontSize: 16,
+    fontFamily: fonts.semiBold,
+    color: colors.ink,
+    backgroundColor: colors.cream,
+  },
+  error: { fontFamily: fonts.bold, color: colors.danger, marginBottom: spacing.sm, fontSize: 13 },
   button: {
-    backgroundColor: "#1c1917",
-    borderRadius: 8,
+    width: "100%",
+    backgroundColor: colors.brand900,
+    borderRadius: radii.md,
     paddingVertical: 14,
     alignItems: "center",
-    marginTop: 8,
+    marginTop: spacing.xs,
   },
+  buttonPressed: { backgroundColor: colors.brand700 },
   buttonDisabled: { opacity: 0.5 },
-  buttonText: { color: "#fff", fontWeight: "600", fontSize: 16 },
+  buttonText: { fontFamily: fonts.extraBold, color: colors.white, fontSize: 16 },
 });

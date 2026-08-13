@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
-import { FlatList, Pressable, StyleSheet, Text } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Redirect, useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { getTaskTypes } from "@/lib/db/catalog";
 import { useNewTaskWizard } from "@/lib/wizard/NewTaskWizardContext";
+import { StepDots } from "@/components/StepDots";
+import { colors, fonts, radii, shadow, spacing } from "@/lib/theme";
 import type { TaskType } from "@/lib/types";
 
 export default function ElegirTipoScreen() {
   const db = useSQLiteContext();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { plotId, setTaskType } = useNewTaskWizard();
   const [taskTypes, setTaskTypes] = useState<TaskType[]>([]);
 
@@ -28,31 +32,51 @@ export default function ElegirTipoScreen() {
   }
 
   return (
-    <FlatList
-      contentContainerStyle={styles.list}
-      data={taskTypes}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <Pressable
-          onPress={() => selectTaskType(item)}
-          accessibilityRole="button"
-          style={styles.row}
-        >
-          <Text style={styles.name}>{item.name}</Text>
-        </Pressable>
-      )}
-    />
+    <View style={styles.wrapper}>
+      <StepDots step={2} />
+      <FlatList
+        contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + spacing.lg }]}
+        data={taskTypes}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <Pressable
+            onPress={() => selectTaskType(item)}
+            accessibilityRole="button"
+            style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+          >
+            <View style={styles.icon}>
+              <Text style={styles.iconText}>🌱</Text>
+            </View>
+            <Text style={styles.name}>{item.name}</Text>
+          </Pressable>
+        )}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  list: { padding: 16 },
-  row: {
-    borderWidth: 1,
-    borderColor: "#e7e5e4",
-    borderRadius: 8,
-    padding: 14,
-    marginBottom: 8,
+  wrapper: { flex: 1, backgroundColor: colors.cream },
+  list: { padding: spacing.lg },
+  card: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    backgroundColor: colors.white,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+    ...shadow,
   },
-  name: { fontSize: 16, fontWeight: "600" },
+  cardPressed: { backgroundColor: colors.brand50 },
+  icon: {
+    width: 40,
+    height: 40,
+    borderRadius: radii.sm,
+    backgroundColor: colors.brand50,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  iconText: { fontSize: 18 },
+  name: { fontFamily: fonts.extraBold, fontSize: 16, color: colors.ink },
 });

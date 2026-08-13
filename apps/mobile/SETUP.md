@@ -1,57 +1,48 @@
 # Setup — Agronotes mobile (Etapa 5)
 
-Código base de la app mobile (React Native + Expo, TypeScript, Expo Router). Escrito sin poder correr un simulador ni Expo real desde este entorno — `tsc`/`eslint` no se pudieron correr limpio acá (ver "Limitaciones" abajo), así que la primera pasada real la tenés que hacer vos, siguiendo estos pasos.
+Código base de la app mobile (React Native + Expo SDK 54, TypeScript, Expo Router). Ya la instalaste y probaste una vez con éxito (flujo offline→sync confirmado en tu Android real) — esta actualización solo suma el rediseño visual (paleta del logo + tipografía Nunito), no vuelve a tocar la base.
 
-## 1. Limpiar `node_modules` antes de instalar
+## Si ya tenés el proyecto corriendo (caso normal)
 
-Al armar este proyecto intenté correr `npx create-expo-app` y `npm install` desde mi entorno (sandbox Linux) contra esta misma carpeta, y quedó una `node_modules/` a medio instalar y corrupta (quedaron archivos con permisos raros que ni yo pude borrar). **Antes de instalar nada, borrá a mano la carpeta `apps/mobile/node_modules` desde el Explorador de Windows** (no hace falta terminal, la carpeta entera) y también `apps/mobile/package-lock.json` si existe.
-
-## 2. Instalar dependencias
-
-Desde `apps/mobile/`:
+Solo hace falta instalar las dos librerías nuevas que usa el rediseño para cargar la fuente Nunito y controlar el splash screen:
 
 ```
-npm install
-npx expo install expo-router expo-sqlite expo-crypto expo-linking expo-constants react-native-safe-area-context react-native-screens @supabase/supabase-js @react-native-async-storage/async-storage @react-native-community/netinfo react-native-url-polyfill
+npx expo install expo-font expo-splash-screen @expo-google-fonts/nunito
 ```
 
-`npx expo install` (no `npm install <paquete>`) es importante: resuelve automáticamente la versión de cada paquete compatible con este SDK de Expo exacto, en vez de instalar el último `latest` a secas.
-
-## 3. Variables de entorno
-
-```
-cp .env.example .env
-```
-
-Completá `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` con el mismo publishable key que ya está en `apps/web/.env.local` (mismo proyecto Supabase, `eccilswknqnwseyllsda`).
-
-## 4. Correr la app
+No hace falta borrar `node_modules` esta vez — son paquetes nuevos, no un cambio de SDK. Después:
 
 ```
 npx expo start
 ```
 
-Te va a mostrar un QR. Instalá **Expo Go** en tu celular (App Store / Play Store) y escaneálo — la app se abre ahí mismo, sin compilar nada nativo. Cada cambio de código se refleja solo (hot reload).
+Y volvé a abrir la app en Expo Go. Deberías ver: ícono nuevo (el logo del cuaderno) en vez del ícono genérico de Expo, colores verdes/madera en vez de blanco y negro, y la tipografía Nunito (más redondeada) en vez de la fuente del sistema.
 
-Si algo no anda al toque, corré `npx expo-doctor` — valida que `app.json`/`package.json` estén coherentes entre sí, cosa que yo no pude verificar acá.
+## Si es la primera vez que lo instalás (setup completo desde cero)
 
-## 5. Cómo probar lo importante (offline + sync)
+1. Borrá `node_modules` y `package-lock.json` si existen (Explorador de Windows, no hace falta terminal).
+2. Desde `apps/mobile/`:
+   ```
+   npm install
+   npx expo install expo-router expo-sqlite expo-crypto expo-linking expo-constants expo-font expo-splash-screen @expo-google-fonts/nunito react-native-safe-area-context react-native-screens @supabase/supabase-js @react-native-async-storage/async-storage @react-native-community/netinfo react-native-url-polyfill
+   ```
+3. `cp .env.example .env` y completá `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (mismo valor que en `apps/web/.env.local`).
+4. `npx expo start`, escaneá el QR con **Expo Go** (Play Store — la versión de las tiendas quedó fija en SDK 54 hace meses, por eso el proyecto está en esa versión, no en la última).
 
-1. Iniciá sesión con un usuario que ya exista en el proyecto Supabase (el mismo que usás en el panel web).
-2. Activá **modo avión** en el celular.
-3. Tocá "+ Nueva tarea", completá los 3 pasos y guardá — tiene que guardarse igual, sin ningún error ni bloqueo (ese es el requisito no negociable de Etapa 1).
-4. En Home vas a ver la tarea con la etiqueta "Pendiente de sincronizar" y el indicador de arriba en naranja.
-5. Desactivá modo avión. El indicador debería pasar a "Sincronizando…" solo (no hace falta reabrir la app) y después a "Todo sincronizado". Confirmá en el panel web (`/tareas`) que la tarea llegó.
+## Cómo probar lo importante (offline + sync)
 
-## 6. Qué falta / limitaciones conocidas
+1. Iniciá sesión con un usuario que ya exista en el proyecto Supabase.
+2. Activá **modo avión**.
+3. Tocá "+ Nueva tarea", completá los 3 pasos y guardá — tiene que guardarse igual, sin bloqueo.
+4. En Home vas a ver la tarea con la etiqueta "Pendiente de sincronizar" y el indicador arriba en color mostaza.
+5. Desactivá modo avión. El indicador pasa a "Sincronizando…" solo y después a "Todo sincronizado". Confirmá en el panel web (`/tareas`) que llegó.
 
-- **No probado en ningún simulador ni dispositivo real todavía** — este entorno no tiene Xcode/Android Studio ni tu celular. `tsc`/`eslint` tampoco se pudieron correr acá (ver más abajo). Es el primer código de Etapa 5 sin ese nivel de verificación que sí tuvo Etapa 3/4.
-- No hay edición ni anulación de tareas desde el mobile — solo alta. Editar/anular ya funciona desde el panel web.
-- La fecha de la tarea siempre es "ahora" (no hay selector de fecha/hora todavía) — para cargar algo de un día anterior, por ahora hay que hacerlo desde el panel.
-- Sin pull-to-refresh manual en Home/Historial (si hace falta, se agrega fácil).
+## Qué falta / limitaciones conocidas
+
+- **El rediseño no se probó en pantalla todavía** — lo armé siguiendo al pixel la guía visual que aprobaste (mismos hex, misma fuente), verificado por lectura de código, pero no hay forma de que yo vea cómo renderiza React Native de verdad. Si algo se ve raro (tamaños, espaciados, algún color que no contraste bien al sol), avisame y lo ajusto.
+- No hay edición ni anulación de tareas desde el mobile — solo alta. Ya funciona desde el panel web.
+- La fecha de la tarea siempre es "ahora" (sin selector de fecha/hora todavía).
+- Sin pull-to-refresh manual en Home/Historial.
 - Sin tests automatizados.
-- `App.tsx` e `index.ts` en la raíz quedaron huérfanos (el scaffold original de Expo) — ya no se usan, el entry point ahora es `expo-router/entry` vía `package.json`. Se pueden borrar a mano.
-
-## Por qué no se pudo verificar desde acá
-
-Intenté instalar el proyecto completo en mi entorno para correr `tsc --noEmit` y `eslint` como hice con el panel web (Etapa 4), pero `npm install`/`create-expo-app` se colgaron repetidamente instalando las dependencias nativas de Expo/React Native (mucho más pesadas que las de Next.js) y terminaron corrompiendo `node_modules` a medio camino. Después de varios intentos preferí escribir el código a mano con cuidado (basado en la documentación oficial vigente de Expo Router, expo-sqlite y Supabase para React Native, que sí pude consultar) en vez de seguir perdiendo tiempo contra el entorno. Por eso este código no tiene el mismo nivel de verificación automática que tuvo el panel web — la prueba real te queda a vos con los pasos de arriba.
+- `App.tsx` e `index.ts` en la raíz son huérfanos del scaffold original (ya no se usan, el entry point es `expo-router/entry`) — se pueden borrar a mano, igual que `assets/android-icon-monochrome.png` (reemplazado, ya no está referenciado en `app.json`).
+- Sin probar en iOS ni en simuladores/emuladores — solo tu Android real.

@@ -5,12 +5,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { getTaskHistory, type TaskHistoryFilters } from "@/lib/db/tasks";
 import { getPlots, getTaskTypes } from "@/lib/db/catalog";
 import { useSync } from "@/lib/sync/useSync";
 import { SyncStatusBadge } from "@/components/SyncStatusBadge";
+import { colors, fonts, radii, shadow, spacing } from "@/lib/theme";
 import type { LocalTask, Plot, TaskType } from "@/lib/types";
 
 const dateFormatter = new Intl.DateTimeFormat("es-AR", {
@@ -29,6 +31,7 @@ const RANGE_OPTIONS = [
 export default function HistorialScreen() {
   const db = useSQLiteContext();
   const sync = useSync();
+  const insets = useSafeAreaInsets();
   const [tasks, setTasks] = useState<LocalTask[]>([]);
   const [plots, setPlots] = useState<Plot[]>([]);
   const [taskTypes, setTaskTypes] = useState<TaskType[]>([]);
@@ -73,7 +76,12 @@ export default function HistorialScreen() {
     <View style={styles.container}>
       <SyncStatusBadge sync={sync} />
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsRow}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.chipsRow}
+        contentContainerStyle={styles.chipsRowContent}
+      >
         {RANGE_OPTIONS.map((opt) => (
           <Chip
             key={opt.label}
@@ -84,7 +92,12 @@ export default function HistorialScreen() {
         ))}
       </ScrollView>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsRow}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.chipsRow}
+        contentContainerStyle={styles.chipsRowContent}
+      >
         <Chip label="Todos los lotes" active={!plotFilter} onPress={() => setPlotFilter(null)} />
         {plots.map((p) => (
           <Chip
@@ -96,7 +109,12 @@ export default function HistorialScreen() {
         ))}
       </ScrollView>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsRow}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.chipsRow}
+        contentContainerStyle={styles.chipsRowContent}
+      >
         <Chip
           label="Todos los tipos"
           active={!taskTypeFilter}
@@ -115,7 +133,7 @@ export default function HistorialScreen() {
       <FlatList
         data={tasks}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + spacing.xl }]}
         ListEmptyComponent={
           <Text style={styles.empty}>No hay tareas que coincidan con estos filtros.</Text>
         }
@@ -130,7 +148,12 @@ export default function HistorialScreen() {
             </Text>
             {item.note && <Text style={styles.note}>{item.note}</Text>}
             {item.sync_status !== "synced" && (
-              <Text style={item.sync_status === "error" ? styles.errorTag : styles.pendingTag}>
+              <Text
+                style={[
+                  styles.tag,
+                  item.sync_status === "error" ? styles.tagError : styles.tagPending,
+                ]}
+              >
                 {item.sync_status === "error" ? "Error al sincronizar" : "Pendiente de sincronizar"}
               </Text>
             )}
@@ -163,33 +186,43 @@ function Chip({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 16 },
-  chipsRow: { flexDirection: "row", marginBottom: 8 },
+  container: { flex: 1, paddingHorizontal: spacing.lg, backgroundColor: colors.cream },
+  chipsRow: { flexGrow: 0, marginBottom: spacing.sm },
+  chipsRowContent: { flexDirection: "row", alignItems: "flex-start" },
   chip: {
-    borderWidth: 1,
-    borderColor: "#d6d3d1",
-    borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    marginRight: 8,
+    backgroundColor: colors.brand50,
+    borderRadius: radii.pill,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 7,
+    marginRight: spacing.sm,
   },
-  chipActive: { backgroundColor: "#1c1917", borderColor: "#1c1917" },
-  chipText: { fontSize: 13, color: "#44403c" },
-  chipTextActive: { color: "#fff" },
-  list: { paddingTop: 8, paddingBottom: 24 },
-  empty: { color: "#78716c", fontSize: 14, paddingVertical: 24, textAlign: "center" },
+  chipActive: { backgroundColor: colors.brand900 },
+  chipText: { fontSize: 13, fontFamily: fonts.bold, color: colors.brand800 },
+  chipTextActive: { color: colors.white },
+  list: { paddingTop: spacing.sm, paddingBottom: spacing.xl },
+  empty: { color: colors.inkMuted, fontFamily: fonts.semiBold, fontSize: 14, paddingVertical: spacing.xl, textAlign: "center" },
   row: {
-    borderWidth: 1,
-    borderColor: "#e7e5e4",
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
+    backgroundColor: colors.white,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+    ...shadow,
   },
   rowHeader: { flexDirection: "row", justifyContent: "space-between" },
-  taskType: { fontWeight: "600", fontSize: 15 },
-  date: { color: "#78716c", fontSize: 12 },
-  detail: { color: "#57534e", fontSize: 13, marginTop: 2 },
-  note: { color: "#78716c", fontSize: 13, marginTop: 4, fontStyle: "italic" },
-  pendingTag: { color: "#d97706", fontSize: 12, marginTop: 4 },
-  errorTag: { color: "#dc2626", fontSize: 12, marginTop: 4 },
+  taskType: { fontFamily: fonts.extraBold, fontSize: 15, color: colors.brand900 },
+  date: { color: colors.inkFaint, fontFamily: fonts.semiBold, fontSize: 12 },
+  detail: { color: colors.inkMuted, fontFamily: fonts.semiBold, fontSize: 13, marginTop: 2 },
+  note: { color: colors.inkFaint, fontFamily: fonts.semiBold, fontSize: 13, marginTop: spacing.xs, fontStyle: "italic" },
+  tag: {
+    alignSelf: "flex-start",
+    marginTop: spacing.sm,
+    fontFamily: fonts.extraBold,
+    fontSize: 11,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: radii.pill,
+    overflow: "hidden",
+  },
+  tagPending: { color: colors.warning, backgroundColor: colors.warningBg },
+  tagError: { color: colors.danger, backgroundColor: colors.dangerBg },
 });

@@ -12,19 +12,19 @@ type Props = {
   };
 };
 
+const selectClass =
+  "rounded-lg border-2 border-line bg-white px-2.5 py-1.5 text-sm font-semibold text-ink";
+const inputClass = selectClass;
+const labelClass = "text-xs font-extrabold text-ink-muted";
+
 export function TaskFiltersForm({ options, current }: Props) {
   return (
-    <form method="get" className="mb-6 flex flex-wrap items-end gap-3" aria-label="Filtros de tareas">
+    <form method="get" className="mb-6 flex flex-wrap items-end gap-3 rounded-2xl border border-line bg-white p-4 shadow-sm" aria-label="Filtros de tareas">
       <div className="flex flex-col gap-1">
-        <label htmlFor="campo" className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
+        <label htmlFor="campo" className={labelClass}>
           Campo
         </label>
-        <select
-          id="campo"
-          name="campo"
-          defaultValue={current.campo ?? ""}
-          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm dark:border-neutral-700 dark:bg-neutral-900"
-        >
+        <select id="campo" name="campo" defaultValue={current.campo ?? ""} className={selectClass}>
           <option value="">Todos</option>
           {options.fields.map((f) => (
             <option key={f.id} value={f.id}>
@@ -35,15 +35,10 @@ export function TaskFiltersForm({ options, current }: Props) {
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="lote" className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
+        <label htmlFor="lote" className={labelClass}>
           Lote
         </label>
-        <select
-          id="lote"
-          name="lote"
-          defaultValue={current.lote ?? ""}
-          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm dark:border-neutral-700 dark:bg-neutral-900"
-        >
+        <select id="lote" name="lote" defaultValue={current.lote ?? ""} className={selectClass}>
           <option value="">Todos</option>
           {options.plots.map((p) => (
             <option key={p.id} value={p.id}>
@@ -54,15 +49,10 @@ export function TaskFiltersForm({ options, current }: Props) {
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="tipo" className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
+        <label htmlFor="tipo" className={labelClass}>
           Tipo de tarea
         </label>
-        <select
-          id="tipo"
-          name="tipo"
-          defaultValue={current.tipo ?? ""}
-          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm dark:border-neutral-700 dark:bg-neutral-900"
-        >
+        <select id="tipo" name="tipo" defaultValue={current.tipo ?? ""} className={selectClass}>
           <option value="">Todos</option>
           {options.taskTypes.map((t) => (
             <option key={t.id} value={t.id}>
@@ -73,15 +63,10 @@ export function TaskFiltersForm({ options, current }: Props) {
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="usuario" className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
+        <label htmlFor="usuario" className={labelClass}>
           Usuario
         </label>
-        <select
-          id="usuario"
-          name="usuario"
-          defaultValue={current.usuario ?? ""}
-          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm dark:border-neutral-700 dark:bg-neutral-900"
-        >
+        <select id="usuario" name="usuario" defaultValue={current.usuario ?? ""} className={selectClass}>
           <option value="">Todos</option>
           {options.users.map((u) => (
             <option key={u.id} value={u.id}>
@@ -92,41 +77,29 @@ export function TaskFiltersForm({ options, current }: Props) {
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="desde" className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
+        <label htmlFor="desde" className={labelClass}>
           Desde
         </label>
-        <input
-          id="desde"
-          name="desde"
-          type="date"
-          defaultValue={current.desde ?? ""}
-          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm dark:border-neutral-700 dark:bg-neutral-900"
-        />
+        <input id="desde" name="desde" type="date" defaultValue={current.desde ?? ""} className={inputClass} />
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="hasta" className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
+        <label htmlFor="hasta" className={labelClass}>
           Hasta
         </label>
-        <input
-          id="hasta"
-          name="hasta"
-          type="date"
-          defaultValue={current.hasta ?? ""}
-          className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm dark:border-neutral-700 dark:bg-neutral-900"
-        />
+        <input id="hasta" name="hasta" type="date" defaultValue={current.hasta ?? ""} className={inputClass} />
       </div>
 
       <div className="flex gap-2">
         <button
           type="submit"
-          className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-neutral-700 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+          className="rounded-lg bg-brand-900 px-3 py-1.5 text-sm font-extrabold text-white hover:bg-brand-700"
         >
           Aplicar filtros
         </button>
         <a
           href="/tareas"
-          className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
+          className="rounded-lg border-2 border-line px-3 py-1.5 text-sm font-bold text-ink-muted hover:bg-brand-50"
         >
           Limpiar
         </a>

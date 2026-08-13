@@ -56,10 +56,10 @@ export default async function TareasPage({
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Tareas</h1>
+        <h1 className="text-xl font-extrabold text-brand-900">Tareas</h1>
         <a
           href={`/tareas/export${exportQs.toString() ? `?${exportQs}` : ""}`}
-          className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+          className="rounded-lg bg-tan-500 px-3 py-1.5 text-sm font-extrabold text-white hover:opacity-90"
         >
           Exportar CSV
         </a>
@@ -78,36 +78,36 @@ export default async function TareasPage({
       />
 
       {rows.length === 0 ? (
-        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+        <p className="text-sm font-semibold text-ink-muted">
           No hay tareas que coincidan con estos filtros.
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-neutral-200 dark:border-neutral-800">
+        <div className="overflow-x-auto rounded-2xl border border-line bg-white shadow-sm">
           <table className="w-full text-sm">
             <caption className="sr-only">Listado de tareas registradas</caption>
-            <thead className="bg-neutral-50 text-left dark:bg-neutral-900">
+            <thead className="bg-brand-50 text-left">
               <tr>
-                <th scope="col" className="px-3 py-2 font-medium">Fecha</th>
-                <th scope="col" className="px-3 py-2 font-medium">Tipo</th>
-                <th scope="col" className="px-3 py-2 font-medium">Campo</th>
-                <th scope="col" className="px-3 py-2 font-medium">Lote</th>
-                <th scope="col" className="px-3 py-2 font-medium">Cantidad</th>
-                <th scope="col" className="px-3 py-2 font-medium">Usuario</th>
-                <th scope="col" className="px-3 py-2 font-medium">Nota</th>
+                <th scope="col" className="px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-brand-800">Fecha</th>
+                <th scope="col" className="px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-brand-800">Tipo</th>
+                <th scope="col" className="px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-brand-800">Campo</th>
+                <th scope="col" className="px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-brand-800">Lote</th>
+                <th scope="col" className="px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-brand-800">Cantidad</th>
+                <th scope="col" className="px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-brand-800">Usuario</th>
+                <th scope="col" className="px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-brand-800">Nota</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((tarea) => (
-                <tr key={tarea.id} className="border-t border-neutral-200 dark:border-neutral-800">
-                  <td className="px-3 py-2 whitespace-nowrap">{dateFormatter.format(new Date(tarea.occurredAt))}</td>
-                  <td className="px-3 py-2">{tarea.tipo}</td>
-                  <td className="px-3 py-2">{tarea.campo}</td>
-                  <td className="px-3 py-2">{tarea.lote}</td>
-                  <td className="px-3 py-2 tabular-nums whitespace-nowrap">
+                <tr key={tarea.id} className="border-t border-line font-semibold text-ink">
+                  <td className="px-3 py-2.5 whitespace-nowrap">{dateFormatter.format(new Date(tarea.occurredAt))}</td>
+                  <td className="px-3 py-2.5">{tarea.tipo}</td>
+                  <td className="px-3 py-2.5">{tarea.campo}</td>
+                  <td className="px-3 py-2.5">{tarea.lote}</td>
+                  <td className="px-3 py-2.5 tabular-nums whitespace-nowrap">
                     {tarea.quantity} {tarea.unit}
                   </td>
-                  <td className="px-3 py-2">{tarea.usuario}</td>
-                  <td className="px-3 py-2 text-neutral-500 dark:text-neutral-400">{tarea.note ?? ""}</td>
+                  <td className="px-3 py-2.5">{tarea.usuario}</td>
+                  <td className="px-3 py-2.5 text-ink-muted">{tarea.note ?? ""}</td>
                 </tr>
               ))}
             </tbody>

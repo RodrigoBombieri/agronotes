@@ -9,16 +9,20 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Redirect, useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { insertLocalTask } from "@/lib/db/tasks";
 import { useNewTaskWizard } from "@/lib/wizard/NewTaskWizardContext";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useSync } from "@/lib/sync/useSync";
+import { StepDots } from "@/components/StepDots";
+import { colors, fonts, radii, shadow, spacing } from "@/lib/theme";
 
 export default function DetalleScreen() {
   const db = useSQLiteContext();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { session } = useAuth();
   const sync = useSync();
   const wizard = useNewTaskWizard();
@@ -76,7 +80,10 @@ export default function DetalleScreen() {
       style={styles.flex}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ScrollView contentContainerStyle={styles.container}>
+      <StepDots step={3} />
+      <ScrollView
+        contentContainerStyle={[styles.container, { paddingBottom: insets.bottom + spacing.lg }]}
+      >
         <View style={styles.field}>
           <Text style={styles.label}>Cantidad</Text>
           <TextInput
@@ -95,6 +102,7 @@ export default function DetalleScreen() {
             onChangeText={wizard.setUnit}
             style={styles.input}
             placeholder="litros, kg, hectáreas…"
+            placeholderTextColor={colors.inkFaint}
             accessibilityLabel="Unidad"
           />
         </View>
@@ -120,7 +128,11 @@ export default function DetalleScreen() {
         <Pressable
           onPress={handleGuardar}
           disabled={saving}
-          style={[styles.button, saving && styles.buttonDisabled]}
+          style={({ pressed }) => [
+            styles.button,
+            saving && styles.buttonDisabled,
+            pressed && styles.buttonPressed,
+          ]}
           accessibilityRole="button"
         >
           <Text style={styles.buttonText}>{saving ? "Guardando…" : "Guardar tarea"}</Text>
@@ -131,27 +143,32 @@ export default function DetalleScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
-  container: { padding: 16 },
-  field: { marginBottom: 16 },
-  label: { fontSize: 13, fontWeight: "600", marginBottom: 6, color: "#44403c" },
+  flex: { flex: 1, backgroundColor: colors.cream },
+  container: { padding: spacing.lg },
+  field: { marginBottom: spacing.md },
+  label: { fontFamily: fonts.bold, fontSize: 12, marginBottom: 6, color: colors.ink },
   input: {
-    borderWidth: 1,
-    borderColor: "#d6d3d1",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    borderWidth: 2,
+    borderColor: colors.line,
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 11,
     fontSize: 16,
+    fontFamily: fonts.semiBold,
+    color: colors.ink,
+    backgroundColor: colors.white,
   },
   textarea: { minHeight: 90, textAlignVertical: "top" },
-  error: { color: "#dc2626", marginBottom: 12, fontSize: 13 },
+  error: { fontFamily: fonts.bold, color: colors.danger, marginBottom: spacing.sm, fontSize: 13 },
   button: {
-    backgroundColor: "#1c1917",
-    borderRadius: 8,
-    paddingVertical: 14,
+    backgroundColor: colors.brand900,
+    borderRadius: radii.md,
+    paddingVertical: 15,
     alignItems: "center",
-    marginTop: 8,
+    marginTop: spacing.xs,
+    ...shadow,
   },
+  buttonPressed: { backgroundColor: colors.brand700 },
   buttonDisabled: { opacity: 0.5 },
-  buttonText: { color: "#fff", fontWeight: "600", fontSize: 16 },
+  buttonText: { fontFamily: fonts.extraBold, color: colors.white, fontSize: 16 },
 });

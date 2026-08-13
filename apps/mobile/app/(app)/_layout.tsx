@@ -4,15 +4,17 @@
 
 import { ActivityIndicator, View } from "react-native";
 import { Redirect, Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { colors, fonts } from "@/lib/theme";
 
 export default function AppLayout() {
   const { session, isLoading } = useAuth();
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator />
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: colors.cream }}>
+        <ActivityIndicator color={colors.brand700} />
       </View>
     );
   }
@@ -22,10 +24,21 @@ export default function AppLayout() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: true }}>
-      <Stack.Screen name="index" options={{ title: "Agronotes" }} />
-      <Stack.Screen name="historial" options={{ title: "Historial" }} />
-      <Stack.Screen name="nueva-tarea" options={{ headerShown: false }} />
-    </Stack>
+    <>
+      <StatusBar style="light" />
+      <Stack
+        screenOptions={{
+          headerShown: true,
+          headerStyle: { backgroundColor: colors.brand900 },
+          headerTintColor: colors.white,
+          headerTitleStyle: { fontFamily: fonts.extraBold, fontSize: 17 },
+          contentStyle: { backgroundColor: colors.cream },
+        }}
+      >
+        <Stack.Screen name="index" options={{ title: "Agronotes" }} />
+        <Stack.Screen name="historial" options={{ title: "Historial" }} />
+        <Stack.Screen name="nueva-tarea" options={{ headerShown: false }} />
+      </Stack>
+    </>
   );
 }
