@@ -18,6 +18,12 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
+# Credencial de la cuenta de servicio de Google Play (Etapa 6, 2026-08-16)
+# — la usa `eas submit` (ver eas.json, submit.production.android). Nunca
+# se sube al repo, cada uno la descarga de su cuenta de Google Play
+# Console. Ver docs/google-play-checklist.md para cómo generarla.
+google-play-service-account.json
+
 # Metro
 .metro-health-check*
 

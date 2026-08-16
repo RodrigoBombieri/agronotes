@@ -39,6 +39,7 @@ export default function AppLayout() {
         <Stack.Screen name="historial" options={{ title: "Historial" }} />
         <Stack.Screen name="nueva-tarea" options={{ headerShown: false }} />
         <Stack.Screen name="tarea/[id]" options={{ title: "Editar tarea" }} />
+        <Stack.Screen name="eliminar-cuenta" options={{ title: "Eliminar cuenta" }} />
       </Stack>
     </>
   );

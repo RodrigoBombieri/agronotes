@@ -137,6 +137,12 @@ export default function HomeScreen() {
           <Text style={styles.link}>Cerrar sesión</Text>
         </Pressable>
       </View>
+
+      <Link href="/eliminar-cuenta" asChild>
+        <Pressable accessibilityRole="button" style={styles.deleteAccountLink}>
+          <Text style={styles.deleteAccountLinkText}>Eliminar mi cuenta</Text>
+        </Pressable>
+      </Link>
     </View>
   );
 }
@@ -200,4 +206,6 @@ const styles = StyleSheet.create({
     borderTopColor: colors.line,
   },
   link: { color: colors.brand700, fontSize: 14, fontFamily: fonts.extraBold },
+  deleteAccountLink: { alignItems: "center", paddingTop: spacing.md },
+  deleteAccountLinkText: { color: colors.inkFaint, fontSize: 12, fontFamily: fonts.semiBold },
 });

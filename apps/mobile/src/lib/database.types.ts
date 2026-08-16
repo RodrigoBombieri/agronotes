@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_deletion_requests: {
+        Row: {
+          email: string
+          id: string
+          notes: string | null
+          processed_at: string | null
+          reason: string | null
+          requested_at: string
+          status: string
+        }
+        Insert: {
+          email: string
+          id?: string
+          notes?: string | null
+          processed_at?: string | null
+          reason?: string | null
+          requested_at?: string
+          status?: string
+        }
+        Update: {
+          email?: string
+          id?: string
+          notes?: string | null
+          processed_at?: string | null
+          reason?: string | null
+          requested_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
       fields: {
         Row: {
           created_at: string
@@ -173,7 +203,6 @@ export type Database = {
       }
       subscriptions: {
         Row: {
-          contracted_fields_count: number | null
           created_at: string
           current_period_end: string | null
           id: string
@@ -185,7 +214,6 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          contracted_fields_count?: number | null
           created_at?: string
           current_period_end?: string | null
           id?: string
@@ -197,7 +225,6 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          contracted_fields_count?: number | null
           created_at?: string
           current_period_end?: string | null
           id?: string
@@ -222,7 +249,6 @@ export type Database = {
         Row: {
           created_at: string
           default_unit: string
-          deleted_at: string | null
           id: string
           name: string
           organization_id: string | null
@@ -231,7 +257,6 @@ export type Database = {
         Insert: {
           created_at?: string
           default_unit: string
-          deleted_at?: string | null
           id?: string
           name: string
           organization_id?: string | null
@@ -240,7 +265,6 @@ export type Database = {
         Update: {
           created_at?: string
           default_unit?: string
-          deleted_at?: string | null
           id?: string
           name?: string
           organization_id?: string | null

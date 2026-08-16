@@ -12,6 +12,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.agronotes.mobile",
       "adaptiveIcon": {
         "backgroundColor": "#FBF9F3",
         "foregroundImage": "./assets/android-icon-foreground.png",

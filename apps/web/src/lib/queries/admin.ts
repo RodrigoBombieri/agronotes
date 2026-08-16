@@ -27,6 +27,33 @@ export type PlatformSummary = {
   }[];
 };
 
+// Pedidos de eliminación de cuenta (Etapa 6, 2026-08-16) — ver
+// account_deletion_requests en la migración del mismo nombre y
+// lib/actions/account-deletion.ts. Solo se muestran los pendientes; los ya
+// resueltos no aportan nada a la vista de "qué falta hacer".
+export type DeletionRequest = {
+  id: string;
+  email: string;
+  reason: string | null;
+  requestedAt: string;
+};
+
+export async function getPendingDeletionRequests(): Promise<DeletionRequest[]> {
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from("account_deletion_requests")
+    .select("id, email, reason, requested_at")
+    .eq("status", "pending")
+    .order("requested_at", { ascending: true });
+
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    email: r.email,
+    reason: r.reason,
+    requestedAt: r.requested_at,
+  }));
+}
+
 // statusLabel se movió a src/lib/subscription-status.ts (Etapa 6,
 // 2026-08-16) para compartirlo con la página /suscripcion — se re-exporta
 // acá para no romper imports existentes desde app/admin/page.tsx.

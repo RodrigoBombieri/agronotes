@@ -36,6 +36,12 @@
 // campo del panel; en producción, con credenciales reales, puede quedar
 // en blanco y usar su propio email.
 //
+// notification_url (agregado 2026-08-16, ver más abajo en el cuerpo del
+// request a MP): sin esto el webhook nunca se entera de los eventos de la
+// preapproval y la suscripción queda para siempre en pending/trialing, no
+// pasa nunca a active. No es configurable por el panel de MP para
+// Suscripciones — tiene que ir en cada preapproval.
+//
 // Header requerido: Authorization: Bearer <jwt del usuario admin>
 //
 // Deploy: supabase functions deploy create-subscription
@@ -137,6 +143,18 @@ Deno.serve(async (req: Request) => {
 
   const amount = PRICE_PER_FIELD_ARS * activeFields;
 
+  // notification_url: acá es donde Mercado Pago manda los eventos de esta
+  // preapproval puntual. Encontrado 2026-08-16 revisando por qué ninguna
+  // suscripción pasaba nunca de `pending`/`trialing` a `active`: faltaba
+  // este campo. La config de webhook por el panel de MP ("Tus
+  // integraciones > Webhooks") NO cubre el tópico "Suscripciones" — la vía
+  // que sí funciona es pasar notification_url en cada preapproval creada
+  // por API (ya estaba anotado como pendiente desde la Etapa 3, ver
+  // planificador.md). Se arma con SUPABASE_URL, no viene del cliente,
+  // porque es siempre la misma URL de la Edge Function sin importar dónde
+  // esté corriendo el panel web.
+  const notificationUrl = `${SUPABASE_URL}/functions/v1/mercadopago-webhook`;
+
   const mpResponse = await fetch("https://api.mercadopago.com/preapproval", {
     method: "POST",
     headers: {
@@ -148,6 +166,7 @@ Deno.serve(async (req: Request) => {
       external_reference: callerProfile.organization_id,
       payer_email: payerEmail,
       back_url: backUrl,
+      notification_url: notificationUrl,
       status: "pending",
       auto_recurring: {
         frequency: 1,

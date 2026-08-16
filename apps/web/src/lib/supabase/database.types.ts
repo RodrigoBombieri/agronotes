@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_deletion_requests: {
+        Row: {
+          email: string
+          id: string
+          notes: string | null
+          processed_at: string | null
+          reason: string | null
+          requested_at: string
+          status: string
+        }
+        Insert: {
+          email: string
+          id?: string
+          notes?: string | null
+          processed_at?: string | null
+          reason?: string | null
+          requested_at?: string
+          status?: string
+        }
+        Update: {
+          email?: string
+          id?: string
+          notes?: string | null
+          processed_at?: string | null
+          reason?: string | null
+          requested_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
       fields: {
         Row: {
           created_at: string
@@ -380,8 +410,10 @@ export type Database = {
         Args: { org_name: string }
         Returns: string
       }
+      current_org_can_write: { Args: never; Returns: boolean }
       current_org_id: { Args: never; Returns: string }
       current_user_role: { Args: never; Returns: string }
+      expire_trials: { Args: never; Returns: undefined }
       is_admin: { Args: never; Returns: boolean }
     }
     Enums: {

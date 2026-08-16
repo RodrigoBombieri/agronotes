@@ -1,5 +1,6 @@
-import { getPlatformSummary, statusLabel } from "@/lib/queries/admin";
+import { getPendingDeletionRequests, getPlatformSummary, statusLabel } from "@/lib/queries/admin";
 import { StatCard } from "@/components/stat-card";
+import { MarkDoneButton } from "@/components/deletion-request-actions";
 
 const dateTimeFormatter = new Intl.DateTimeFormat("es-AR", {
   day: "2-digit",
@@ -10,7 +11,10 @@ const dateTimeFormatter = new Intl.DateTimeFormat("es-AR", {
 });
 
 export default async function AdminPage() {
-  const summary = await getPlatformSummary();
+  const [summary, deletionRequests] = await Promise.all([
+    getPlatformSummary(),
+    getPendingDeletionRequests(),
+  ]);
 
   return (
     <div>
@@ -70,6 +74,59 @@ export default async function AdminPage() {
             </table>
           </div>
         )}
+      </section>
+
+      <section
+        aria-labelledby="bajas-heading"
+        className="mt-8 rounded-2xl border border-line bg-white p-5 shadow-sm"
+      >
+        <h2 id="bajas-heading" className="mb-4 text-sm font-extrabold text-brand-800">
+          Pedidos de eliminación de cuenta pendientes
+        </h2>
+        {deletionRequests.length === 0 ? (
+          <p className="text-sm font-semibold text-ink-muted">No hay pedidos pendientes.</p>
+        ) : (
+          <div className="overflow-x-auto rounded-xl border border-line">
+            <table className="w-full text-sm">
+              <caption className="sr-only">Pedidos de eliminación de cuenta pendientes</caption>
+              <thead className="bg-brand-50 text-left">
+                <tr>
+                  <th scope="col" className="px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-brand-800">
+                    Fecha del pedido
+                  </th>
+                  <th scope="col" className="px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-brand-800">
+                    Email
+                  </th>
+                  <th scope="col" className="px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-brand-800">
+                    Motivo
+                  </th>
+                  <th scope="col" className="px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide text-brand-800">
+                    <span className="sr-only">Acciones</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {deletionRequests.map((request) => (
+                  <tr key={request.id} className="border-t border-line font-semibold text-ink">
+                    <td className="px-3 py-2.5 whitespace-nowrap">
+                      {dateTimeFormatter.format(new Date(request.requestedAt))}
+                    </td>
+                    <td className="px-3 py-2.5">{request.email}</td>
+                    <td className="px-3 py-2.5">{request.reason ?? "—"}</td>
+                    <td className="px-3 py-2.5 text-right">
+                      <MarkDoneButton id={request.id} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        <p className="mt-3 text-xs font-semibold text-ink-faint">
+          Marcá un pedido como resuelto solo después de haber eliminado a mano los datos
+          personales de esa persona en Supabase (tabla <code>users</code>, y en{" "}
+          <code>auth.users</code> si corresponde borrar la cuenta de acceso).
+        </p>
       </section>
     </div>
   );
