@@ -10,6 +10,7 @@ type WizardState = {
   quantity: string;
   unit: string;
   note: string;
+  occurredAt: Date;
 };
 
 type WizardContextValue = WizardState & {
@@ -18,21 +19,28 @@ type WizardContextValue = WizardState & {
   setQuantity: (quantity: string) => void;
   setUnit: (unit: string) => void;
   setNote: (note: string) => void;
+  setOccurredAt: (occurredAt: Date) => void;
   reset: () => void;
 };
 
-const initialState: WizardState = {
-  plotId: null,
-  taskTypeId: null,
-  quantity: "",
-  unit: "",
-  note: "",
-};
+// Función y no constante de módulo: `occurredAt` tiene que ser el momento en
+// que se empieza a cargar la tarea, no el momento en que se importó el
+// archivo (que sería siempre el arranque de la app).
+function makeInitialState(): WizardState {
+  return {
+    plotId: null,
+    taskTypeId: null,
+    quantity: "",
+    unit: "",
+    note: "",
+    occurredAt: new Date(),
+  };
+}
 
 const WizardContext = createContext<WizardContextValue | null>(null);
 
 export function NewTaskWizardProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<WizardState>(initialState);
+  const [state, setState] = useState<WizardState>(makeInitialState);
 
   const value = useMemo<WizardContextValue>(
     () => ({
@@ -43,7 +51,8 @@ export function NewTaskWizardProvider({ children }: { children: ReactNode }) {
       setQuantity: (quantity) => setState((s) => ({ ...s, quantity })),
       setUnit: (unit) => setState((s) => ({ ...s, unit })),
       setNote: (note) => setState((s) => ({ ...s, note })),
-      reset: () => setState(initialState),
+      setOccurredAt: (occurredAt) => setState((s) => ({ ...s, occurredAt })),
+      reset: () => setState(makeInitialState()),
     }),
     [state],
   );

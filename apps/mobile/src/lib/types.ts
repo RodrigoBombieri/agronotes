@@ -41,6 +41,13 @@ export type LocalTask = {
   unit: string;
   note: string | null;
   occurred_at: string; // ISO 8601
+  /**
+   * Soft delete (anulación). Si tiene fecha, la tarea está anulada: no se
+   * muestra en Home/Historial, pero sigue existiendo localmente y se
+   * sincroniza como anulación al servidor. Nunca se borra en duro — misma
+   * regla que en la base (ver "Decisiones clave" del planificador).
+   */
+  deleted_at: string | null;
   sync_status: SyncStatus;
   sync_error: string | null;
   updated_at: string; // ISO 8601, para saber qué es "lo último" en la UI local.
@@ -54,3 +61,12 @@ export type NewTaskInput = {
   note: string | null;
   occurred_at: string;
 };
+
+/**
+ * Campos editables de una tarea ya registrada. Es el mismo conjunto que
+ * `NewTaskInput` a propósito: desde el mobile se puede corregir cualquier
+ * dato de la tarea (incluido el lote y el tipo), porque el caso real es
+ * "me equivoqué de lote al cargar". Lo que no se toca nunca es el `id` ni
+ * el `user_id` — eso rompería la idempotencia del upsert y la autoría.
+ */
+export type EditTaskInput = NewTaskInput;

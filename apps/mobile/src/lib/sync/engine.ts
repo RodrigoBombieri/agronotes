@@ -25,6 +25,18 @@ export type SyncResult = {
   failed: number;
 };
 
+/**
+ * Lo que el dispositivo manda al servidor por cada tarea. Es el Insert
+ * generado por Supabase **menos `organization_id`**, que a propósito no se
+ * manda nunca: lo completa el trigger `tasks_set_organization` a partir del
+ * lote (decisión de Etapa 2 — el cliente no puede falsear a qué organización
+ * pertenece una tarea). Los tipos generados no saben de triggers y lo marcan
+ * como obligatorio, de ahí el cast puntual en el upsert de abajo; el resto
+ * de los campos sí queda tipado contra el esquema real.
+ */
+type TaskInsert = Database["public"]["Tables"]["tasks"]["Insert"];
+type TaskUpsertPayload = Omit<TaskInsert, "organization_id">;
+
 export async function runSync(
   db: SQLiteDatabase,
   supabase: SupabaseClient<Database>,
@@ -75,19 +87,26 @@ async function pushPendingTasks(
   let failed = 0;
 
   for (const task of pending) {
-    const { error } = await supabase.from("tasks").upsert(
-      {
-        id: task.id,
-        plot_id: task.plot_id,
-        task_type_id: task.task_type_id,
-        user_id: task.user_id,
-        quantity: task.quantity,
-        unit: task.unit,
-        note: task.note,
-        occurred_at: task.occurred_at,
-      },
-      { onConflict: "id" },
-    );
+    // `deleted_at` viaja igual que cualquier otro campo: una anulación hecha
+    // en el celular es, para el servidor, un upsert más sobre la misma fila
+    // que le pone la marca de borrado lógico. Por eso getPendingTasks() no
+    // filtra las anuladas — si lo hiciera, quedarían borradas solo en el
+    // dispositivo (Etapa 6, 2026-08-16).
+    const payload: TaskUpsertPayload = {
+      id: task.id,
+      plot_id: task.plot_id,
+      task_type_id: task.task_type_id,
+      user_id: task.user_id,
+      quantity: task.quantity,
+      unit: task.unit,
+      note: task.note,
+      occurred_at: task.occurred_at,
+      deleted_at: task.deleted_at,
+    };
+
+    const { error } = await supabase
+      .from("tasks")
+      .upsert(payload as TaskInsert, { onConflict: "id" });
 
     if (error) {
       failed += 1;

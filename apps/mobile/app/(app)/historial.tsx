@@ -4,9 +4,17 @@
 // sincronizadas y muestra su estado.
 
 import { useCallback, useEffect, useState } from "react";
-import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { getTaskHistory, type TaskHistoryFilters } from "@/lib/db/tasks";
 import { getPlots, getTaskTypes } from "@/lib/db/catalog";
@@ -31,6 +39,7 @@ const RANGE_OPTIONS = [
 export default function HistorialScreen() {
   const db = useSQLiteContext();
   const sync = useSync();
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const [tasks, setTasks] = useState<LocalTask[]>([]);
   const [plots, setPlots] = useState<Plot[]>([]);
@@ -38,6 +47,7 @@ export default function HistorialScreen() {
   const [plotFilter, setPlotFilter] = useState<string | null>(null);
   const [taskTypeFilter, setTaskTypeFilter] = useState<string | null>(null);
   const [rangeDays, setRangeDays] = useState<number | null>(30);
+  const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
     const filters: TaskHistoryFilters = {};
@@ -68,6 +78,19 @@ export default function HistorialScreen() {
       load();
     }, [load]),
   );
+
+  // Pull-to-refresh: mismo criterio que en Home — forzar un ciclo de sync a
+  // mano y releer la base local, en vez de depender solo del disparo
+  // automático por reconexión.
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await sync.syncNow();
+      await load();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [sync, load]);
 
   const plotName = (id: string) => plots.find((p) => p.id === id)?.name ?? "—";
   const taskTypeName = (id: string) => taskTypes.find((t) => t.id === id)?.name ?? "Tarea";
@@ -134,11 +157,24 @@ export default function HistorialScreen() {
         data={tasks}
         keyExtractor={(item) => item.id}
         contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + spacing.xl }]}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={[colors.brand700]}
+            tintColor={colors.brand700}
+          />
+        }
         ListEmptyComponent={
           <Text style={styles.empty}>No hay tareas que coincidan con estos filtros.</Text>
         }
         renderItem={({ item }) => (
-          <View style={styles.row}>
+          <Pressable
+            onPress={() => router.push({ pathname: "/tarea/[id]", params: { id: item.id } })}
+            accessibilityRole="button"
+            accessibilityLabel={`Editar tarea ${taskTypeName(item.task_type_id)}`}
+            style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+          >
             <View style={styles.rowHeader}>
               <Text style={styles.taskType}>{taskTypeName(item.task_type_id)}</Text>
               <Text style={styles.date}>{dateFormatter.format(new Date(item.occurred_at))}</Text>
@@ -157,7 +193,7 @@ export default function HistorialScreen() {
                 {item.sync_status === "error" ? "Error al sincronizar" : "Pendiente de sincronizar"}
               </Text>
             )}
-          </View>
+          </Pressable>
         )}
       />
     </View>
@@ -208,6 +244,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
     ...shadow,
   },
+  rowPressed: { backgroundColor: colors.brand50 },
   rowHeader: { flexDirection: "row", justifyContent: "space-between" },
   taskType: { fontFamily: fonts.extraBold, fontSize: 15, color: colors.brand900 },
   date: { color: colors.inkFaint, fontFamily: fonts.semiBold, fontSize: 12 },

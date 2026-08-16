@@ -17,6 +17,7 @@ import { useNewTaskWizard } from "@/lib/wizard/NewTaskWizardContext";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useSync } from "@/lib/sync/useSync";
 import { StepDots } from "@/components/StepDots";
+import { DateTimeField } from "@/components/DateTimeField";
 import { colors, fonts, radii, shadow, spacing } from "@/lib/theme";
 
 export default function DetalleScreen() {
@@ -61,14 +62,23 @@ export default function DetalleScreen() {
         quantity: quantityNumber,
         unit: wizard.unit.trim(),
         note: wizard.note.trim() || null,
-        occurred_at: new Date().toISOString(),
+        occurred_at: wizard.occurredAt.toISOString(),
       });
+
+      // Home solo lista las tareas de hoy. Si se cargó una con fecha
+      // anterior, se avisa ahí mismo para que no parezca que no se guardó
+      // (se calcula antes del reset, que pisa `occurredAt`).
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+      const guardadaOtraFecha = wizard.occurredAt < startOfToday;
 
       wizard.reset();
       // Dispara un intento de sync en segundo plano (no bloquea la
       // navegación — si no hay señal, la tarea queda 'pending' y listo).
       sync.syncNow();
-      router.replace("/");
+      router.replace(
+        guardadaOtraFecha ? { pathname: "/", params: { guardada: "otra-fecha" } } : { pathname: "/" },
+      );
     } catch (err) {
       setSaving(false);
       setError(err instanceof Error ? err.message : "No se pudo guardar la tarea.");
@@ -106,6 +116,8 @@ export default function DetalleScreen() {
             accessibilityLabel="Unidad"
           />
         </View>
+
+        <DateTimeField value={wizard.occurredAt} onChange={wizard.setOccurredAt} />
 
         <View style={styles.field}>
           <Text style={styles.label}>Observación (opcional)</Text>

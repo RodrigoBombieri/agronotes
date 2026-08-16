@@ -12,16 +12,29 @@
 // apps/web/src/lib/subscription-status.ts — si cambia el precio hay que
 // actualizar los 3 lugares y volver a desplegar.
 //
-// Body esperado: { "backUrl": string } — a dónde vuelve el usuario después
-// de pagar (o cancelar) en Mercado Pago. Lo arma el cliente con
-// `window.location.origin`, porque todavía no hay un dominio fijo de
-// producción. IMPORTANTE (encontrado 2026-08-16 probando en local):
-// Mercado Pago EXIGE que back_url empiece con https:// — rechaza http
-// (incluido http://localhost, que es lo que manda `npm run dev` en
-// desarrollo) con "Invalid value for back_url, must be a valid URL".
-// Para probar este flujo de punta a punta hace falta un dominio con HTTPS
-// real (deploy en Vercel) o un túnel https a localhost (ngrok, etc.) — no
-// hay forma de evitarlo, es una validación del lado de Mercado Pago.
+// Body esperado: { "backUrl": string, "payerEmail"?: string } — backUrl es
+// a dónde vuelve el usuario después de pagar (o cancelar) en Mercado Pago,
+// lo arma el cliente con `window.location.origin`, porque todavía no hay
+// un dominio fijo de producción. IMPORTANTE (encontrado 2026-08-16
+// probando en local): Mercado Pago EXIGE que back_url empiece con
+// https:// — rechaza http (incluido http://localhost, que es lo que manda
+// `npm run dev` en desarrollo) con "Invalid value for back_url, must be a
+// valid URL". Para probar este flujo de punta a punta hace falta un
+// dominio con HTTPS real (deploy en Vercel) o un túnel https a localhost
+// (ngrok, etc.) — no hay forma de evitarlo, es una validación del lado de
+// Mercado Pago.
+//
+// payerEmail es opcional — si no se manda, se usa el email de login del
+// admin (`caller.email`). IMPORTANTE (encontrado 2026-08-16 probando en
+// Vercel): con credenciales de prueba (TEST-...) de Mercado Pago, el
+// payer_email tiene que ser una cuenta de prueba real generada con la API
+// de test users de MP (POST /users/test_user) — cualquier otro email
+// (incluido el de login de Supabase si no es una cuenta de MP real o de
+// prueba) devuelve "Both payer and collector must be real or test users".
+// Por eso se permite mandar un payerEmail distinto del login: en
+// desarrollo/pruebas, el admin genera un test user de MP y lo pega en el
+// campo del panel; en producción, con credenciales reales, puede quedar
+// en blanco y usar su propio email.
 //
 // Header requerido: Authorization: Bearer <jwt del usuario admin>
 //
@@ -78,7 +91,7 @@ Deno.serve(async (req: Request) => {
     return errorResponse("FORBIDDEN", "Solo un admin puede gestionar la suscripción");
   }
 
-  let body: { backUrl?: string };
+  let body: { backUrl?: string; payerEmail?: string };
   try {
     body = await req.json();
   } catch {
@@ -91,6 +104,11 @@ Deno.serve(async (req: Request) => {
       "VALIDATION_ERROR",
       "La URL de retorno tiene que empezar con https:// — Mercado Pago no acepta http (por ejemplo, http://localhost en desarrollo). Probá desde un dominio con HTTPS (deploy en Vercel) o un túnel https a tu servidor local.",
     );
+  }
+
+  const payerEmail = (body.payerEmail?.trim().toLowerCase() || caller.email || "").trim();
+  if (!payerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payerEmail)) {
+    return errorResponse("VALIDATION_ERROR", "Email de pago inválido");
   }
 
   const [{ data: organization }, { data: subscription }, { count: fieldsCount }] =
@@ -128,7 +146,7 @@ Deno.serve(async (req: Request) => {
     body: JSON.stringify({
       reason: `Agronotes - Suscripción mensual (${organization?.name ?? "Agronotes"})`,
       external_reference: callerProfile.organization_id,
-      payer_email: caller.email,
+      payer_email: payerEmail,
       back_url: backUrl,
       status: "pending",
       auto_recurring: {
@@ -148,6 +166,16 @@ Deno.serve(async (req: Request) => {
       mpMessage = JSON.parse(errorBody)?.message;
     } catch {
       // errorBody no era JSON, seguimos con el mensaje genérico.
+    }
+    // Caso puntual visto en pruebas (2026-08-16): con credenciales TEST de
+    // MP, el payer_email tiene que ser un test user real de MP, no
+    // cualquier email — se agrega la aclaración para no tener que ir a
+    // revisar los logs cada vez.
+    if (mpMessage?.includes("must be real or test users")) {
+      return errorResponse(
+        "INTERNAL_ERROR",
+        "Mercado Pago rechazó el email de pago: con credenciales de prueba, tiene que ser una cuenta de prueba de Mercado Pago (creála en el panel de developers de MP, sección \"Cuentas de prueba\", y usá ese email en el campo de arriba) — no puede ser cualquier email.",
+      );
     }
     return errorResponse(
       "INTERNAL_ERROR",

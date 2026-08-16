@@ -105,7 +105,10 @@ export default async function SuscripcionPage({
           )
         ) : (
           <div className="mt-5">
-            <SubscribeButton disabled={info.activeFieldsCount === 0} />
+            <SubscribeButton
+              disabled={info.activeFieldsCount === 0}
+              defaultPayerEmail={info.userEmail}
+            />
             {info.activeFieldsCount === 0 && (
               <p className="mt-2 text-sm font-semibold text-ink-muted">
                 Cargá al menos un campo antes de suscribirte.

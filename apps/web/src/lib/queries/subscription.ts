@@ -13,6 +13,7 @@ import { PRICE_PER_FIELD_ARS } from "@/lib/subscription-status";
 export type SubscriptionInfo = {
   isAdmin: boolean;
   organizationId: string;
+  userEmail: string;
   status: string;
   providerSubscriptionId: string | null;
   currentPeriodEnd: string | null;
@@ -58,6 +59,7 @@ export async function getSubscriptionInfo(
   return {
     isAdmin: profile.role === "admin",
     organizationId: profile.organization_id,
+    userEmail: user.email ?? "",
     status: subscription?.status ?? "sin_suscripcion",
     providerSubscriptionId: subscription?.provider_subscription_id ?? null,
     currentPeriodEnd: subscription?.current_period_end ?? null,

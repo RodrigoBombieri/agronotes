@@ -38,6 +38,7 @@ export default function AppLayout() {
         <Stack.Screen name="index" options={{ title: "Agronotes" }} />
         <Stack.Screen name="historial" options={{ title: "Historial" }} />
         <Stack.Screen name="nueva-tarea" options={{ headerShown: false }} />
+        <Stack.Screen name="tarea/[id]" options={{ title: "Editar tarea" }} />
       </Stack>
     </>
   );

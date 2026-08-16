@@ -10,11 +10,24 @@ import { createClient } from "@/lib/supabase/client";
 // La confirmación real de que el pago se completó llega después, de forma
 // asíncrona, vía el webhook — por eso acá no hay ningún estado de "éxito",
 // solo el redirect.
+//
+// El campo de email de pago (editable) se agregó el mismo día porque, con
+// credenciales de prueba de Mercado Pago, el payer_email tiene que ser una
+// cuenta de prueba de MP — no alcanza con el email de login del admin. En
+// producción, con credenciales reales, el admin puede dejarlo con su
+// propio email (el valor por default).
 
 type CreateSubscriptionResponse = { checkoutUrl?: string };
 type ErrorBody = { error?: { message?: string } };
 
-export function SubscribeButton({ disabled }: { disabled?: boolean }) {
+export function SubscribeButton({
+  disabled,
+  defaultPayerEmail,
+}: {
+  disabled?: boolean;
+  defaultPayerEmail: string;
+}) {
+  const [payerEmail, setPayerEmail] = useState(defaultPayerEmail);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,7 +40,7 @@ export function SubscribeButton({ disabled }: { disabled?: boolean }) {
 
     const { data, error: invokeError } = await supabase.functions.invoke<CreateSubscriptionResponse>(
       "create-subscription",
-      { body: { backUrl } },
+      { body: { backUrl, payerEmail: payerEmail.trim() } },
     );
 
     if (invokeError) {
@@ -57,10 +70,24 @@ export function SubscribeButton({ disabled }: { disabled?: boolean }) {
 
   return (
     <div>
+      <div className="mb-3 flex flex-col gap-1.5">
+        <label htmlFor="payer-email" className="text-xs font-bold text-ink-muted">
+          Email para el pago (si usás credenciales de prueba de Mercado Pago, tiene que ser una
+          cuenta de prueba de MP, no tu email de acceso)
+        </label>
+        <input
+          id="payer-email"
+          type="email"
+          value={payerEmail}
+          onChange={(event) => setPayerEmail(event.target.value)}
+          disabled={disabled || loading}
+          className="rounded-xl border-2 border-line bg-cream px-3 py-2 text-sm font-semibold text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:opacity-60"
+        />
+      </div>
       <button
         type="button"
         onClick={handleClick}
-        disabled={disabled || loading}
+        disabled={disabled || loading || !payerEmail.trim()}
         className="rounded-xl bg-brand-900 px-4 py-2.5 text-[15px] font-extrabold text-white hover:bg-brand-700 disabled:opacity-60"
       >
         {loading ? "Redirigiendo a Mercado Pago…" : "Suscribirme"}
