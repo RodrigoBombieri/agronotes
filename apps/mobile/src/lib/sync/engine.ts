@@ -64,7 +64,10 @@ async function pullCatalog(
     await Promise.all([
       supabase.from("fields").select("id, name").is("deleted_at", null),
       supabase.from("plots").select("id, field_id, name, hectares").is("deleted_at", null),
-      supabase.from("task_types").select("id, name, default_unit"),
+      // task_types también filtra por deleted_at desde que el panel web
+      // permite dar de baja tipos custom (Etapa 6, 2026-08-16); los tipos
+      // globales del producto nunca tienen deleted_at.
+      supabase.from("task_types").select("id, name, default_unit").is("deleted_at", null),
     ]);
 
   if (fieldsError) throw fieldsError;

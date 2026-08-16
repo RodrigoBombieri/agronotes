@@ -40,12 +40,24 @@ export async function AppHeader() {
             <Image src="/logo-64.png" alt="" width={28} height={28} className="rounded-lg" priority />
             Agronotes
           </Link>
-          <nav aria-label="Navegación principal" className="flex items-center gap-5 text-sm font-bold">
+          <nav
+            aria-label="Navegación principal"
+            className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-bold"
+          >
             <Link href="/" className="text-brand-100 hover:text-white">
               Dashboard
             </Link>
             <Link href="/tareas" className="text-brand-100 hover:text-white">
               Tareas
+            </Link>
+            <Link href="/campos" className="text-brand-100 hover:text-white">
+              Campos
+            </Link>
+            <Link href="/tipos" className="text-brand-100 hover:text-white">
+              Tipos
+            </Link>
+            <Link href="/usuarios" className="text-brand-100 hover:text-white">
+              Usuarios
             </Link>
             <Link href="/suscripcion" className="text-brand-100 hover:text-white">
               Suscripción
