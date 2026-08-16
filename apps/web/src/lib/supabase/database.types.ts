@@ -70,6 +70,59 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_events: {
+        Row: {
+          id: string
+          organization_id: string
+          provider: string
+          provider_event_id: string | null
+          raw_payload: Json
+          received_at: string
+          resulting_status: string | null
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          provider?: string
+          provider_event_id?: string | null
+          raw_payload: Json
+          received_at?: string
+          resulting_status?: string | null
+        }
+        Update: {
+          id?: string
+          organization_id?: string
+          provider?: string
+          provider_event_id?: string | null
+          raw_payload?: Json
+          received_at?: string
+          resulting_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      platform_admins: {
+        Row: {
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       plots: {
         Row: {
           created_at: string

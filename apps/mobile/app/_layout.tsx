@@ -8,6 +8,7 @@ import { Stack } from "expo-router";
 import { SQLiteProvider } from "expo-sqlite";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
+import * as Sentry from "@sentry/react-native";
 import {
   useFonts,
   Nunito_400Regular,
@@ -23,7 +24,19 @@ import { AuthProvider } from "@/lib/auth/AuthContext";
 // sistema por medio segundo al abrir la app.
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+// Observabilidad (Etapa 6) — captura crashes y errores no manejados en el
+// dispositivo. Solo necesita el DSN para funcionar (ver apps/mobile/.env);
+// la subida de source maps para EAS Build queda pendiente aparte (necesita
+// el plugin de Expo + metro.config.js + org/project de Sentry, todavía no
+// configurados — sin eso los stack traces en producción llegan sin
+// símbolos, pero los eventos de error/crash ya se reciben igual).
+Sentry.init({
+  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
+  tracesSampleRate: __DEV__ ? 1.0 : 0.2,
+  enabled: !__DEV__ || Boolean(process.env.EXPO_PUBLIC_SENTRY_DSN),
+});
+
+function RootLayout() {
   const [fontsLoaded] = useFonts({
     Nunito_400Regular,
     Nunito_600SemiBold,
@@ -50,3 +63,5 @@ export default function RootLayout() {
     </SafeAreaProvider>
   );
 }
+
+export default Sentry.wrap(RootLayout);

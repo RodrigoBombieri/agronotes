@@ -1,33 +1,34 @@
 // supabase/functions/mercadopago-webhook/index.ts
 //
 // Recibe las notificaciones de "preapproval" (suscripción recurrente) de
-// Mercado Pago y actualiza public.subscriptions. Tiene que ser un Edge
-// Function sí o sí: es un endpoint HTTP público que Mercado Pago llama
-// directamente, no algo que el cliente de la app dispare.
+// Mercado Pago y actualiza public.subscriptions. verify_jwt=false porque
+// Mercado Pago no manda un JWT de Supabase — la autenticación es propia,
+// vía x-signature.
+//
+// Algoritmo de x-signature verificado contra los ejemplos oficiales del
+// SDK de Mercado Pago (docs, agosto 2026): HMAC-SHA256 sobre el manifest
+// "id:{data.id};request-id:{x-request-id};ts:{ts};" usando el webhook
+// secret. Ver planificador.md Etapa 3 para el detalle de la verificación
+// y una nota importante sobre el botón "Simular" de Mercado Pago.
 //
 // Configuración necesaria en Mercado Pago (Tus integraciones > Webhooks):
 //   URL: https://<project-ref>.supabase.co/functions/v1/mercadopago-webhook
 //   Eventos: "Suscripciones" (preapproval)
-// Ahí mismo Mercado Pago te da el "Secret" para validar x-signature.
 //
-// Variables de entorno a configurar (supabase secrets set):
-//   MP_ACCESS_TOKEN   -> access token privado de la cuenta de Mercado Pago
-//   MP_WEBHOOK_SECRET -> secret de firma del webhook (NO es el access token)
+// Variables de entorno (supabase secrets set):
+//   MP_ACCESS_TOKEN, MP_WEBHOOK_SECRET
 //   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY -> ya provistas en runtime
 //
-// Validación de x-signature: implementada según la documentación oficial
-// de Mercado Pago (manifest "id:{data.id};request-id:{x-request-id};ts:{ts};"
-// firmado con HMAC-SHA256 usando el webhook secret). Válido a agosto 2026;
-// si Mercado Pago cambia el formato, revisar
-// https://www.mercadopago.com.ar/developers/es/docs/your-integrations/notifications/webhooks
-// antes de asumir que esto sigue funcionando igual.
-//
-// Requisito de negocio (Etapa 2/CLAUDE.md): esta tabla no tiene policies
-// de insert/update para el cliente — solo la service role, que se usa
-// acá, puede tocarla.
+// Etapa 6 (2026-08-16): además de actualizar subscriptions, cada
+// notificación válida se guarda tal cual (payload crudo de MP) en
+// payment_events, para tener historial real de pagos en el panel
+// superadmin — antes solo quedaba el estado actual, sin rastro de cómo se
+// llegó ahí. Un fallo al guardar el evento se loguea pero NO hace fallar
+// la respuesta al webhook (lo crítico es que subscriptions haya quedado
+// bien actualizada; el historial es una mejora, no debe bloquear a MP).
 
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { corsHeaders, errorResponse, jsonResponse } from "../_shared/responses.ts";
+import { corsHeaders, errorResponse, jsonResponse } from "./_shared/responses.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -36,7 +37,6 @@ const MP_WEBHOOK_SECRET = Deno.env.get("MP_WEBHOOK_SECRET")!;
 
 const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-// preapproval.status (Mercado Pago) -> subscriptions.status (nuestro)
 const STATUS_MAP: Record<string, string> = {
   authorized: "active",
   paused: "past_due",
@@ -89,8 +89,6 @@ Deno.serve(async (req: Request) => {
   const type = url.searchParams.get("type") ?? url.searchParams.get("topic");
 
   if (!dataId) {
-    // Mercado Pago manda notificaciones de prueba sin data.id al validar
-    // la URL — respondemos 200 para no romper esa verificación.
     return jsonResponse({ received: true, ignored: "no data.id" }, 200);
   }
 
@@ -100,8 +98,6 @@ Deno.serve(async (req: Request) => {
   }
 
   if (type && type !== "preapproval" && type !== "subscription_preapproval") {
-    // no es un evento de suscripción (puede ser un pago suelto u otro
-    // tipo de notificación) — lo confirmamos y no hacemos nada más.
     return jsonResponse({ received: true, ignored: `type=${type}` }, 200);
   }
 
@@ -135,6 +131,18 @@ Deno.serve(async (req: Request) => {
 
   if (error) {
     return errorResponse("INTERNAL_ERROR", `No se pudo actualizar subscriptions: ${error.message}`);
+  }
+
+  // Historial crudo para el panel superadmin — no bloquea la respuesta si falla.
+  const { error: logError } = await admin.from("payment_events").insert({
+    organization_id: organizationId,
+    provider: "mercado_pago",
+    provider_event_id: dataId,
+    resulting_status: status,
+    raw_payload: preapproval,
+  });
+  if (logError) {
+    console.error("No se pudo guardar payment_events (no bloqueante):", logError.message);
   }
 
   return jsonResponse({ received: true, organizationId, status }, 200);
