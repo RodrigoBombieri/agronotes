@@ -173,6 +173,7 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          contracted_fields_count: number | null
           created_at: string
           current_period_end: string | null
           id: string
@@ -184,6 +185,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          contracted_fields_count?: number | null
           created_at?: string
           current_period_end?: string | null
           id?: string
@@ -195,6 +197,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          contracted_fields_count?: number | null
           created_at?: string
           current_period_end?: string | null
           id?: string

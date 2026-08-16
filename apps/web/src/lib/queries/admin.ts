@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { statusLabel } from "@/lib/subscription-status";
 
 // Chequea si un usuario es superadmin de la plataforma. Usa la service
 // role porque platform_admins no tiene ninguna policy para el rol
@@ -26,17 +27,10 @@ export type PlatformSummary = {
   }[];
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  trialing: "En prueba",
-  active: "Activa",
-  past_due: "Pago vencido",
-  canceled: "Cancelada",
-  sin_suscripcion: "Sin suscripción",
-};
-
-export function statusLabel(status: string): string {
-  return STATUS_LABELS[status] ?? status;
-}
+// statusLabel se movió a src/lib/subscription-status.ts (Etapa 6,
+// 2026-08-16) para compartirlo con la página /suscripcion — se re-exporta
+// acá para no romper imports existentes desde app/admin/page.tsx.
+export { statusLabel };
 
 export async function getPlatformSummary(): Promise<PlatformSummary> {
   const admin = createAdminClient();

@@ -93,10 +93,18 @@ async function pushPendingTasks(
       failed += 1;
       // Errores de red (fetch failed, timeout) vs errores reales del server
       // (validación, RLS) no se distinguen acá con precisión — Supabase-js
-      // no siempre expone eso con claridad en React Native. Se guarda el
-      // mensaje tal cual para que se vea en el indicador de sync; el
-      // usuario o el próximo ciclo lo reintentan igual.
-      await markTaskSyncError(db, task.id, error.message);
+      // no siempre expone eso con claridad en React Native. Una excepción:
+      // el código 42501 de Postgres es siempre una violación de RLS (por
+      // ejemplo, el modo solo lectura por suscripción vencida, Etapa 6,
+      // 2026-08-16) — para ese caso puntual mostramos un mensaje más claro
+      // que el texto crudo de Postgres. El resto se guarda tal cual para
+      // que se vea en el indicador de sync; el usuario o el próximo ciclo
+      // lo reintentan igual.
+      const message =
+        error.code === "42501"
+          ? "No se pudo guardar: sin permiso (revisá el estado de la suscripción de tu organización)."
+          : error.message;
+      await markTaskSyncError(db, task.id, message);
       continue;
     }
 
