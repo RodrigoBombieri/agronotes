@@ -38,6 +38,19 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b4050338-c56b-4a03-af4a-72ae823e6a6e"
+      }
+    },
+    "owner": "rbombieri",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/b4050338-c56b-4a03-af4a-72ae823e6a6e"
     }
   }
 }
